@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.0'
+        self.program_name = 'IonogramViewer2 v1.1'
 
         uic.loadUi('./ui/MainWnd.ui', self)
         self.actionExit.triggered.connect(exit)
@@ -30,6 +30,9 @@ class MainWindow(QMainWindow):
         self.actionAbout.triggered.connect(self.show_about)
         self.actionNext.triggered.connect(self.open_next_file)
         self.actionPrevious.triggered.connect(self.open_prev_file)
+        self.actionFirst.triggered.connect(self.open_first_file)
+        self.actionLast.triggered.connect(self.open_last_file)
+        self.actionReload.triggered.connect(self.reopen_file)
 
         self.mode = 0  # E
         self.radioButtonE.toggled.connect(lambda: self.change_mode(0))
@@ -86,11 +89,16 @@ class MainWindow(QMainWindow):
     def delete_menu(self, point):
         if self.sender().count():
             listMenu = QMenu()
-            listMenu.addAction('Delete')
+            delete_action = listMenu.addAction('Delete')
+            delete_all_action = listMenu.addAction('Delete all')
             point_global = self.sender().mapToGlobal(point)
-            if listMenu.exec_(point_global):
-                self.sender().takeItem(self.sender().row(self.sender().itemAt(point)))
-                self.plot_scatter()
+            r = listMenu.exec_(point_global)
+            if r is delete_action:
+                item = self.sender().row(self.sender().itemAt(point))
+                self.sender().takeItem(item)
+            elif r is delete_all_action:
+                self.sender().clear()
+            self.plot_scatter()
 
     def change_mode(self, mode):
         self.mode = mode
@@ -100,21 +108,15 @@ class MainWindow(QMainWindow):
         self.listWidgetF1.setEnabled(False)
         self.lineEditF2.setEnabled(False)
         self.listWidgetF2.setEnabled(False)
-        self.checkBoxE.setEnabled(False)
-        self.checkBoxF1.setEnabled(False)
-        self.checkBoxF2.setEnabled(False)
         if mode == 0:
             self.lineEditE.setEnabled(True)
             self.listWidgetE.setEnabled(True)
-            self.checkBoxE.setEnabled(True)
         elif mode == 1:
             self.lineEditF1.setEnabled(True)
             self.listWidgetF1.setEnabled(True)
-            self.checkBoxF1.setEnabled(True)
         elif mode == 2:
             self.lineEditF2.setEnabled(True)
             self.listWidgetF2.setEnabled(True)
-            self.checkBoxF2.setEnabled(True)
 
     def onclick(self, event):
         if event.ydata and event.xdata:
@@ -122,22 +124,20 @@ class MainWindow(QMainWindow):
             h = event.ydata
             s = '{:-5.2f} {:-5.1f}'.format(f, h)
             f = '{:-5.2f}'.format(f)
-            if self.mode == 0:  # E
-                if not self.checkBoxE.isChecked():
-                    self.lineEditE.setText(f)
-                else:
+            if event.button == 1:
+                if self.mode == 0:  # E
                     self.listWidgetE.addItem(s)
-            elif self.mode == 1:  # F1
-                if not self.checkBoxF1.isChecked():
-                    self.lineEditF1.setText(f)
-                else:
+                elif self.mode == 1:  # F1
                     self.listWidgetF1.addItem(s)
-            elif self.mode == 2:  # F2
-                if not self.checkBoxF2.isChecked():
-                    self.lineEditF2.setText(f)
-                else:
+                elif self.mode == 2:  # F2
                     self.listWidgetF2.addItem(s)
-
+            else:
+                if self.mode == 0:  # E
+                    self.lineEditE.setText(f)
+                elif self.mode == 1:  # F1
+                    self.lineEditF1.setText(f)
+                elif self.mode == 2:  # F2
+                    self.lineEditF2.setText(f)
             self.plot_scatter()
 
     def plot_scatter(self):
@@ -296,8 +296,8 @@ class MainWindow(QMainWindow):
             directory = path.dirname(self.file_name)
             filenames = self.get_filelist(directory)
             index = filenames.index(path.basename(self.file_name))
-            if index+1 < len(filenames):
-                new_file_name = path.join(directory, filenames[index+1])
+            if index + 1 < len(filenames):
+                new_file_name = path.join(directory, filenames[index + 1])
                 self.open_file(new_file_name)
 
     def open_prev_file(self):
@@ -305,9 +305,27 @@ class MainWindow(QMainWindow):
             directory = path.dirname(self.file_name)
             filenames = self.get_filelist(directory)
             index = filenames.index(path.basename(self.file_name))
-            if index-1 >= 0:
-                new_file_name = path.join(directory, filenames[index-1])
+            if index - 1 >= 0:
+                new_file_name = path.join(directory, filenames[index - 1])
                 self.open_file(new_file_name)
+
+    def open_last_file(self):
+        if self.file_name:
+            directory = path.dirname(self.file_name)
+            filenames = self.get_filelist(directory)
+            new_file_name = path.join(directory, filenames[-1])
+            self.open_file(new_file_name)
+
+    def open_first_file(self):
+        if self.file_name:
+            directory = path.dirname(self.file_name)
+            filenames = self.get_filelist(directory)
+            new_file_name = path.join(directory, filenames[0])
+            self.open_file(new_file_name)
+
+    def reopen_file(self):
+        if self.file_name:
+            self.open_file(self.file_name)
 
     def get_filelist(self, directory):
             filenames = []
@@ -430,7 +448,7 @@ class MainWindow(QMainWindow):
 
     def show_about(self):
         about = """
-        IonogramViewer2 version 1.0
+        IonogramViewer2 version 1.1
         © 2018 Oleksandr Bogomaz
         """
         msg = QMessageBox()

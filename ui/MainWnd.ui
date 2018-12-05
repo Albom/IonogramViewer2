@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>693</width>
-    <height>614</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>400</width>
+    <width>600</width>
     <height>0</height>
    </size>
   </property>
@@ -31,7 +31,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>693</width>
+     <width>800</width>
      <height>21</height>
     </rect>
    </property>
@@ -66,8 +66,8 @@
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
       <widget class="QRadioButton" name="radioButtonE">
        <property name="toolTip">
         <string notr="true">The E trace data group</string>
@@ -80,10 +80,11 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item>
       <widget class="QLineEdit" name="lineEditE">
        <property name="toolTip">
-        <string notr="true">The critical frequency of the layer E</string>
+        <string notr="true">The critical frequency of the layer E
+(Right-click)</string>
        </property>
        <property name="inputMethodHints">
         <set>Qt::ImhNone</set>
@@ -99,14 +100,18 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item>
       <widget class="QListWidget" name="listWidgetE">
+       <property name="toolTip">
+        <string notr="true">The trace points (f in MHz, h' in km)
+(Left-click)</string>
+       </property>
        <property name="sortingEnabled">
         <bool>true</bool>
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
+     <item>
       <widget class="QRadioButton" name="radioButtonF1">
        <property name="toolTip">
         <string notr="true">The F1 trace data group</string>
@@ -116,30 +121,35 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item>
       <widget class="QLineEdit" name="lineEditF1">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string notr="true">The critical frequency of the layer F1</string>
+        <string notr="true">The critical frequency of the layer F1
+(Right-click)</string>
        </property>
        <property name="clearButtonEnabled">
         <bool>false</bool>
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item>
       <widget class="QListWidget" name="listWidgetF1">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string notr="true">The trace points (f in MHz, h' in km)
+(Left-click)</string>
        </property>
        <property name="sortingEnabled">
         <bool>true</bool>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item>
       <widget class="QRadioButton" name="radioButtonF2">
        <property name="toolTip">
         <string notr="true">The F2 trace data group</string>
@@ -149,59 +159,28 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="0">
+     <item>
       <widget class="QLineEdit" name="lineEditF2">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string notr="true">The critical frequency of the layer F2</string>
+        <string notr="true">The critical frequency of the layer F2
+(Right-click)</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
+     <item>
       <widget class="QListWidget" name="listWidgetF2">
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string notr="true">The trace points (f in MHz, h' in km)
+(Left-click)</string>
+       </property>
        <property name="sortingEnabled">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QCheckBox" name="checkBoxE">
-       <property name="toolTip">
-        <string notr="true">Fixing the critical frequency of the layer E</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QCheckBox" name="checkBoxF1">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="toolTip">
-        <string notr="true">Fixing the critical frequency of the layer F1</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <widget class="QCheckBox" name="checkBoxF2">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="toolTip">
-        <string notr="true">Fixing the critical frequency of the layer F2</string>
-       </property>
-       <property name="text">
-        <string/>
        </property>
       </widget>
      </item>
@@ -220,8 +199,12 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
+   <addaction name="separator"/>
+   <addaction name="actionFirst"/>
    <addaction name="actionPrevious"/>
+   <addaction name="actionReload"/>
    <addaction name="actionNext"/>
+   <addaction name="actionLast"/>
    <addaction name="separator"/>
    <addaction name="actionHelp"/>
    <addaction name="actionAbout"/>
@@ -290,6 +273,9 @@
    <property name="text">
     <string>Save</string>
    </property>
+   <property name="toolTip">
+    <string>Save (Ctrl+S)</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
@@ -322,6 +308,36 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Space</string>
+   </property>
+  </action>
+  <action name="actionReload">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/view-refresh.png</normaloff>images/view-refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reload</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload</string>
+   </property>
+  </action>
+  <action name="actionFirst">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/go-first.png</normaloff>images/go-first.png</iconset>
+   </property>
+   <property name="text">
+    <string>First</string>
+   </property>
+  </action>
+  <action name="actionLast">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/go-last.png</normaloff>images/go-last.png</iconset>
+   </property>
+   <property name="text">
+    <string>Last</string>
    </property>
   </action>
  </widget>
