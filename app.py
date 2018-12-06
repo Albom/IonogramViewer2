@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.1'
+        self.program_name = 'IonogramViewer2 v1.2'
 
         uic.loadUi('./ui/MainWnd.ui', self)
         self.actionExit.triggered.connect(exit)
@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
         self.actionFirst.triggered.connect(self.open_first_file)
         self.actionLast.triggered.connect(self.open_last_file)
         self.actionReload.triggered.connect(self.reopen_file)
+        self.actionChangeLayer.triggered.connect(self.change_layer)
 
         self.mode = 0  # E
         self.radioButtonE.toggled.connect(lambda: self.change_mode(0))
@@ -62,6 +63,15 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.program_name)
         self.showMaximized()
 
+    def change_layer(self):
+        mode = self.mode+1 if self.mode < 2 else 0
+        if mode == 0:
+            self.radioButtonE.setChecked(True)
+        elif mode == 1:
+            self.radioButtonF1.setChecked(True)
+        elif mode == 2:
+            self.radioButtonF2.setChecked(True)
+        
     def clear_all(self):
         self.e_scatter = None
         self.f1_scatter = None
@@ -448,7 +458,7 @@ class MainWindow(QMainWindow):
 
     def show_about(self):
         about = """
-        IonogramViewer2 version 1.1
+        IonogramViewer2 version 1.2
         © 2018 Oleksandr Bogomaz
         """
         msg = QMessageBox()
