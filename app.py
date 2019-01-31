@@ -12,8 +12,10 @@ from matplotlib.backends.backend_qt5agg \
     import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 
+from iono_tester import IonoTester
 from karazin_iono import KarazinIono
-from uac_iono import UacIono
+from ips42_iono import Ips42Iono
+from dps_amp_iono import DpsAmpIono
 
 
 class MainWindow(QMainWindow):
@@ -21,10 +23,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.2'
+        self.program_name = 'IonogramViewer2 v1.3 pre'
 
         uic.loadUi('./ui/MainWnd.ui', self)
-        self.actionExit.triggered.connect(exit)
+        self.actionExit.triggered.connect(sys.exit)
         self.actionOpen.triggered.connect(self.open_file_dialog)
         self.actionSave.triggered.connect(self.save_file)
         self.actionAbout.triggered.connect(self.show_about)
@@ -35,10 +37,10 @@ class MainWindow(QMainWindow):
         self.actionReload.triggered.connect(self.reopen_file)
         self.actionChangeLayer.triggered.connect(self.change_layer)
 
-        self.mode = 0  # E
-        self.radioButtonE.toggled.connect(lambda: self.change_mode(0))
+        self.change_mode(0)  # F2
+        self.radioButtonF2.toggled.connect(lambda: self.change_mode(0))
         self.radioButtonF1.toggled.connect(lambda: self.change_mode(1))
-        self.radioButtonF2.toggled.connect(lambda: self.change_mode(2))
+        self.radioButtonE.toggled.connect(lambda: self.change_mode(2))
 
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
@@ -66,12 +68,12 @@ class MainWindow(QMainWindow):
     def change_layer(self):
         mode = self.mode+1 if self.mode < 2 else 0
         if mode == 0:
-            self.radioButtonE.setChecked(True)
+            self.radioButtonF2.setChecked(True)
         elif mode == 1:
             self.radioButtonF1.setChecked(True)
         elif mode == 2:
-            self.radioButtonF2.setChecked(True)
-        
+            self.radioButtonE.setChecked(True)
+
     def clear_all(self):
         self.e_scatter = None
         self.f1_scatter = None
@@ -94,7 +96,7 @@ class MainWindow(QMainWindow):
         self.listWidgetF1.clear()
         self.listWidgetF2.clear()
 
-        self.radioButtonE.setChecked(True)
+        self.radioButtonF2.setChecked(True)
 
     def delete_menu(self, point):
         if self.sender().count():
@@ -113,41 +115,47 @@ class MainWindow(QMainWindow):
     def change_mode(self, mode):
         self.mode = mode
         self.lineEditE.setEnabled(False)
+        self.lineEditEm.setEnabled(False)
         self.listWidgetE.setEnabled(False)
         self.lineEditF1.setEnabled(False)
+        self.lineEditF1m.setEnabled(False)
         self.listWidgetF1.setEnabled(False)
         self.lineEditF2.setEnabled(False)
+        self.lineEditF2m.setEnabled(False)
         self.listWidgetF2.setEnabled(False)
         if mode == 0:
-            self.lineEditE.setEnabled(True)
-            self.listWidgetE.setEnabled(True)
+            self.lineEditF2.setEnabled(True)
+            self.lineEditF2m.setEnabled(True)
+            self.listWidgetF2.setEnabled(True)
         elif mode == 1:
             self.lineEditF1.setEnabled(True)
+            self.lineEditF1m.setEnabled(True)
             self.listWidgetF1.setEnabled(True)
         elif mode == 2:
-            self.lineEditF2.setEnabled(True)
-            self.listWidgetF2.setEnabled(True)
+            self.lineEditE.setEnabled(True)
+            self.lineEditEm.setEnabled(True)
+            self.listWidgetE.setEnabled(True)
 
     def onclick(self, event):
         if event.ydata and event.xdata:
-            f = sqrt(2) ** (event.xdata / 2.5)
+            f = self.iono.coord_to_freq(event.xdata)
             h = event.ydata
             s = '{:-5.2f} {:-5.1f}'.format(f, h)
             f = '{:-5.2f}'.format(f)
             if event.button == 1:
-                if self.mode == 0:  # E
-                    self.listWidgetE.addItem(s)
+                if self.mode == 0:  # F2
+                    self.listWidgetF2.addItem(s)
                 elif self.mode == 1:  # F1
                     self.listWidgetF1.addItem(s)
-                elif self.mode == 2:  # F2
-                    self.listWidgetF2.addItem(s)
-            else:
-                if self.mode == 0:  # E
-                    self.lineEditE.setText(f)
+                elif self.mode == 2:  # E
+                    self.listWidgetE.addItem(s)
+            elif event.button == 3:
+                if self.mode == 0:  # F2
+                    self.lineEditF2.setText(f)
                 elif self.mode == 1:  # F1
                     self.lineEditF1.setText(f)
-                elif self.mode == 2:  # F2
-                    self.lineEditF2.setText(f)
+                elif self.mode == 2:  # E
+                    self.lineEditE.setText(f)
             self.plot_scatter()
 
     def plot_scatter(self):
@@ -158,7 +166,7 @@ class MainWindow(QMainWindow):
         y_e = []
         for i in range(self.listWidgetE.count()):
             t = self.listWidgetE.item(i).text().split()
-            x_e.append(log(float(t[0]), sqrt(2)) * 2.5)
+            x_e.append(self.iono.freq_to_coord(t[0]))
             y_e.append(float(t[1]))
         self.e_scatter = self.ax.scatter(x_e, y_e, c='g')
 
@@ -169,7 +177,7 @@ class MainWindow(QMainWindow):
         y_f1 = []
         for i in range(self.listWidgetF1.count()):
             t = self.listWidgetF1.item(i).text().split()
-            x_f1.append(log(float(t[0]), sqrt(2)) * 2.5)
+            x_f1.append(self.iono.freq_to_coord(t[0]))
             y_f1.append(float(t[1]))
         self.f1_scatter = self.ax.scatter(x_f1, y_f1, c='c')
 
@@ -180,13 +188,16 @@ class MainWindow(QMainWindow):
         y_f2 = []
         for i in range(self.listWidgetF2.count()):
             t = self.listWidgetF2.item(i).text().split()
-            x_f2.append(log(float(t[0]), sqrt(2)) * 2.5)
+            x_f2.append(self.iono.freq_to_coord(t[0]))
             y_f2.append(float(t[1]))
         self.f2_scatter = self.ax.scatter(x_f2, y_f2, c='r')
 
         self.canvas.draw()
 
     def plot_lines(self, text):
+
+        top = self.iono.get_extent()[3]
+        bottom = self.iono.get_extent()[2]
 
         if self.iono is None:
             return
@@ -203,8 +214,9 @@ class MainWindow(QMainWindow):
                 self.e_critical.remove()
                 self.e_critical = None
 
-            f = log(float(foE), sqrt(2)) * 2.5
-            self.e_critical, = self.ax.plot([f, f], [50, 750], c='g')
+            f = self.iono.freq_to_coord(foE)
+
+            self.e_critical, = self.ax.plot([f, f], [bottom, top], c='g')
         else:
             if self.e_critical is not None:
                 self.e_critical.remove()
@@ -222,8 +234,8 @@ class MainWindow(QMainWindow):
                 self.f1_critical.remove()
                 self.f1_critical = None
 
-            f = log(float(foF1), sqrt(2)) * 2.5
-            self.f1_critical, = self.ax.plot([f, f], [50, 750], c='c')
+            f = self.iono.freq_to_coord(foF1)
+            self.f1_critical, = self.ax.plot([f, f], [bottom, top], c='c')
         else:
             if self.f1_critical is not None:
                 self.f1_critical.remove()
@@ -241,8 +253,8 @@ class MainWindow(QMainWindow):
                 self.f2_critical.remove()
                 self.f2_critical = None
 
-            f = log(float(foF2), sqrt(2)) * 2.5
-            self.f2_critical, = self.ax.plot([f, f], [50, 750], c='r')
+            f = self.iono.freq_to_coord(foF2)
+            self.f2_critical, = self.ax.plot([f, f], [bottom, top], c='r')
         else:
             if self.f2_critical is not None:
                 self.f2_critical.remove()
@@ -252,7 +264,7 @@ class MainWindow(QMainWindow):
 
     def onmove(self, event):
         if event.ydata and event.xdata:
-            f = sqrt(2) ** (event.xdata / 2.5)
+            f = self.iono.coord_to_freq(event.xdata)
             h = event.ydata
             self.statusbar.showMessage('f={:-5.2f}  h\'={:-5.1f}'.format(f, h))
             if not self.is_cross:
@@ -271,35 +283,35 @@ class MainWindow(QMainWindow):
     def open_file(self, file_name):
         if file_name:
             self.clear_all()
-            self.iono = UacIono()
-            self.iono.load(file_name)
-            data = self.iono.get_data()
-            if data:
 
-                self.file_name = file_name
+            tester = IonoTester()
+            class_name = tester.examine(file_name)['class_name']
+            if class_name:
+                class_ = globals()[class_name]
+                self.iono = class_()
+                self.iono.load(file_name)
+                data = self.iono.get_data()
+                if data:
 
-                self.figure.clear()
-                self.ax = self.figure.add_subplot(111)
+                    self.file_name = file_name
 
-                left = 0
-                right = 22.5
-                bottom = -2
-                top = 796
-                extent = [left, right, bottom, top]
-                self.ax.imshow(data, cmap='hot', interpolation='nearest',
-                               extent=extent, aspect='auto')
-                # [1, 1.4, 2, 2.8, 4, 5.6, 8, 11.4, 16, 22.4]
-                x = ['{:.1f}'.format(sqrt(2) ** i) for i in range(22)]
-                self.ax.set_xticklabels(x)
+                    self.figure.clear()
+                    self.ax = self.figure.add_subplot(111)
 
-                self.setWindowTitle(self.program_name + " - " + file_name)
-                self.canvas.draw()
+                    extent = self.iono.get_extent()
+                    self.ax.imshow(data, cmap='PuOr', interpolation='nearest',
+                                   extent=extent, aspect='auto')
 
-                self.station_name = 'UAC'
-                self.coordinates = '-65.25 -64.25 0.97 -59 0'
-                self.date = '2017 3 17 0 0 0'
+                    self.ax.set_xticklabels(self.iono.get_freq_labels())
 
-                self.load_text_info()
+                    self.setWindowTitle(self.program_name + " - " + file_name)
+                    self.canvas.draw()
+
+                    self.station_name = 'UAC'
+                    self.coordinates = '-65.25 -64.25 0.97 -59 0'
+                    self.date = '2017 3 17 0 0 0'
+
+                    self.load_text_info()
 
     def open_next_file(self):
         if self.file_name:
@@ -338,13 +350,13 @@ class MainWindow(QMainWindow):
             self.open_file(self.file_name)
 
     def get_filelist(self, directory):
-            filenames = []
-            for (dp, dn, fn) in walk(directory):
-                filenames.extend(fn)
-                break
-            filenames.sort()
-            filenames = list(filter(lambda s: s.endswith('.ion'), filenames))
-            return filenames
+        filenames = []
+        for (dp, dn, fn) in walk(directory):
+            filenames.extend(fn)
+            break
+        filenames.sort()
+        filenames = list(filter(lambda s: s.endswith('.ion'), filenames))
+        return filenames
 
     def load_text_info(self):
         try:
@@ -458,8 +470,10 @@ class MainWindow(QMainWindow):
 
     def show_about(self):
         about = """
-        IonogramViewer2 version 1.2
-        © 2018 Oleksandr Bogomaz
+        IonogramViewer2 version 1.3 pre
+
+        © 2018-2019 Oleksandr Bogomaz
+        email: o.v.bogomaz1985@gmail.com
         """
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)

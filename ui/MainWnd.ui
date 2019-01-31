@@ -75,12 +75,12 @@
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QRadioButton" name="radioButtonE">
+      <widget class="QRadioButton" name="radioButtonF2">
        <property name="toolTip">
-        <string notr="true">The E trace data group</string>
+        <string notr="true">The F2 trace data group</string>
        </property>
        <property name="text">
-        <string notr="true">E</string>
+        <string notr="true">F2</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -88,27 +88,32 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditE">
+      <widget class="QLineEdit" name="lineEditF2">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="toolTip">
-        <string notr="true">The critical frequency of the layer E
+        <string notr="true">The critical frequency of the layer F2
 (Right-click)</string>
-       </property>
-       <property name="inputMethodHints">
-        <set>Qt::ImhNone</set>
-       </property>
-       <property name="inputMask">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="placeholderText">
-        <string notr="true"/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QListWidget" name="listWidgetE">
+      <widget class="QLineEdit" name="lineEditF2m">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="toolTip">
+        <string notr="true">The minimal frequency of the layer F2
+(Middle-click)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListWidget" name="listWidgetF2">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="toolTip">
         <string notr="true">The trace points (f in MHz, h' in km)
 (Left-click)</string>
@@ -143,6 +148,17 @@
       </widget>
      </item>
      <item>
+      <widget class="QLineEdit" name="lineEditF1m">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string notr="true">The minimal frequency of the layer F1
+(Middle-click)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QListWidget" name="listWidgetF1">
        <property name="enabled">
         <bool>false</bool>
@@ -157,28 +173,54 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="radioButtonF2">
+      <widget class="QRadioButton" name="radioButtonE">
        <property name="toolTip">
-        <string notr="true">The F2 trace data group</string>
+        <string notr="true">The E trace data group</string>
        </property>
        <property name="text">
-        <string notr="true">F2</string>
+        <string notr="true">E</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditF2">
+      <widget class="QLineEdit" name="lineEditE">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string notr="true">The critical frequency of the layer F2
+        <string notr="true">The critical frequency of the layer E
 (Right-click)</string>
+       </property>
+       <property name="inputMethodHints">
+        <set>Qt::ImhNone</set>
+       </property>
+       <property name="inputMask">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string notr="true"/>
+       </property>
+       <property name="placeholderText">
+        <string notr="true"/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QListWidget" name="listWidgetF2">
+      <widget class="QLineEdit" name="lineEditEm">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string notr="true">The minimal frequency of the layer E
+(Middle-click)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListWidget" name="listWidgetE">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -296,7 +338,7 @@
     <string>Next</string>
    </property>
    <property name="toolTip">
-    <string>Next</string>
+    <string>Next (Ctrl + Space)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Space</string>
@@ -311,7 +353,7 @@
     <string>Previous</string>
    </property>
    <property name="toolTip">
-    <string>Previous</string>
+    <string>Previous (Ctrl + Shift + Space)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Space</string>
