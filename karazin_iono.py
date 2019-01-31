@@ -8,17 +8,17 @@ class KarazinIono:
         for line in lines:
             if line.startswith('Location'):
                 self.location = line.split(':')[1].strip()
-            if line.startswith('z0'):
+            elif line.startswith('z0'):
                 self.z0 = float(line.split('=')[1].strip())
-            if line.startswith('dz'):
+            elif line.startswith('dz'):
                 self.dz = float(line.split('=')[1].strip())
-            if line.startswith('Frep'):
+            elif line.startswith('Frep'):
                 self.frep = float(line.split('=')[1].strip())
-            if line.startswith('Nstrob'):
+            elif line.startswith('Nstrob'):
                 self.nstrob = int(line.split('=')[1].strip())
-            if line.startswith('Nsound'):
+            elif line.startswith('Nsound'):
                 self.nsound = int(line.split('=')[1].strip())
-            if line.startswith('Frequency Set'):
+            elif line.startswith('Frequency Set'):
                 freq_set_section = True
 
         print(self.z0, self.dz, self.nsound, self.nstrob, self.frep)
