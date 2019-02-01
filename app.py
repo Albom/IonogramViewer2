@@ -11,6 +11,7 @@ matplotlib.use("agg")
 from matplotlib.backends.backend_qt5agg \
     import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+from matplotlib import colors
 
 from iono_tester import IonoTester
 from karazin_iono import KarazinIono
@@ -299,7 +300,8 @@ class MainWindow(QMainWindow):
                     self.ax = self.figure.add_subplot(111)
 
                     extent = self.iono.get_extent()
-                    self.ax.imshow(data, cmap='PuOr', interpolation='nearest',
+                    cmap = colors.ListedColormap(['black', 'white', 'purple'])
+                    self.ax.imshow(data, cmap=cmap, interpolation='nearest',
                                    extent=extent, aspect='auto')
 
                     self.ax.set_xticklabels(self.iono.get_freq_labels())
