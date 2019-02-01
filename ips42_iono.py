@@ -37,9 +37,12 @@ class Ips42Iono:
         top = 796
         return [left, right, bottom, top]
 
+    def get_freq_tics(self):
+        return [self.freq_to_coord(x) for x in self.get_freq_labels()]
+
     def get_freq_labels(self):
         # [1, 1.4, 2, 2.8, 4, 5.6, 8, 11.4, 16, 22.4]
-        return ['{:.1f}'.format(sqrt(2) ** i) for i in range(22)]
+        return ['{:.1f}'.format(sqrt(2) ** i) for i in range(10)]
 
     def freq_to_coord(self, freq):
         return log(float(freq), sqrt(2)) * 2.5

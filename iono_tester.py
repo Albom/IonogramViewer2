@@ -5,6 +5,8 @@ from datetime import datetime
 class IonoTester:
     def __init__(self):
         self.FILE_FORMATS = {
+            'Unknown': {
+                'class_name': 'Unknown'},
             'IPS42': {
                 'class_name': 'Ips42Iono',
                 'sizes': [36928]},
@@ -41,7 +43,7 @@ class IonoTester:
 
         max_points = 0
         all_points = 0
-        file_format = ''
+        file_format = 'Unknown'
         for key in keys:
             all_points += self.points[key]
             if self.points[key] > max_points:

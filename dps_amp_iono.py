@@ -10,7 +10,7 @@ class DpsAmpIono:
         self.ionosonde_model = None
 
     def load(self, file_name):
-       
+
         with open(file_name, 'r') as file:
             lines = [line[:-1] for line in file.readlines()]
 
@@ -58,6 +58,9 @@ class DpsAmpIono:
         bottom = self.ranges[0]
         top = self.ranges[-1]
         return [left, right, bottom, top]
+
+    def get_freq_tics(self):
+        return [float(x) for x in self.get_freq_labels()]
 
     def get_freq_labels(self):
         return ['{:.1f}'.format(i) for i in range(int(self.frequencies[0]),

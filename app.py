@@ -27,16 +27,21 @@ class MainWindow(QMainWindow):
         self.program_name = 'IonogramViewer2 v1.3 pre'
 
         uic.loadUi('./ui/MainWnd.ui', self)
-        self.actionExit.triggered.connect(sys.exit)
-        self.actionOpen.triggered.connect(self.open_file_dialog)
-        self.actionSave.triggered.connect(self.save_file)
-        self.actionAbout.triggered.connect(self.show_about)
-        self.actionNext.triggered.connect(self.open_next_file)
-        self.actionPrevious.triggered.connect(self.open_prev_file)
-        self.actionFirst.triggered.connect(self.open_first_file)
-        self.actionLast.triggered.connect(self.open_last_file)
-        self.actionReload.triggered.connect(self.reopen_file)
-        self.actionChangeLayer.triggered.connect(self.change_layer)
+
+        actions = {
+            self.actionExit: sys.exit,
+            self.actionOpen: self.open_file_dialog,
+            self.actionSave: self.save_file,
+            self.actionAbout: self.show_about,
+            self.actionNext: self.open_next_file,
+            self.actionPrevious: self.open_prev_file,
+            self.actionFirst: self.open_first_file,
+            self.actionLast: self.open_last_file,
+            self.actionReload: self.reopen_file,
+            self.actionChangeLayer: self.change_layer}
+
+        for key, action in actions.items():
+            key.triggered.connect(action)
 
         self.change_mode(0)  # F2
         self.radioButtonF2.toggled.connect(lambda: self.change_mode(0))
@@ -50,16 +55,14 @@ class MainWindow(QMainWindow):
         self.canvas.mpl_connect('button_press_event', self.onclick)
         self.canvas.mpl_connect('motion_notify_event', self.onmove)
 
-        self.listWidgetE.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.listWidgetE.customContextMenuRequested.connect(self.delete_menu)
-        self.listWidgetF1.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.listWidgetF1.customContextMenuRequested.connect(self.delete_menu)
-        self.listWidgetF2.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.listWidgetF2.customContextMenuRequested.connect(self.delete_menu)
+        listWidgets = [self.listWidgetE, self.listWidgetF1, self.listWidgetF2]
+        for w in listWidgets:
+            w.setContextMenuPolicy(Qt.CustomContextMenu)
+            w.customContextMenuRequested.connect(self.delete_menu)
 
-        self.lineEditE.textChanged.connect(self.plot_lines)
-        self.lineEditF1.textChanged.connect(self.plot_lines)
-        self.lineEditF2.textChanged.connect(self.plot_lines)
+        lineEdits = [self.lineEditE, self.lineEditF1, self.lineEditF2]
+        for e in lineEdits:
+            e.textChanged.connect(self.plot_lines)
 
         self.clear_all()
 
@@ -115,15 +118,14 @@ class MainWindow(QMainWindow):
 
     def change_mode(self, mode):
         self.mode = mode
-        self.lineEditE.setEnabled(False)
-        self.lineEditEm.setEnabled(False)
-        self.listWidgetE.setEnabled(False)
-        self.lineEditF1.setEnabled(False)
-        self.lineEditF1m.setEnabled(False)
-        self.listWidgetF1.setEnabled(False)
-        self.lineEditF2.setEnabled(False)
-        self.lineEditF2m.setEnabled(False)
-        self.listWidgetF2.setEnabled(False)
+
+        widgets = [
+            self.lineEditE, self.lineEditEm, self.listWidgetE,
+            self.lineEditF1, self.lineEditF1m, self.listWidgetF1,
+            self.lineEditF2, self.lineEditF2m, self.listWidgetF2]
+        for w in widgets:
+            w.setEnabled(False)
+
         if mode == 0:
             self.lineEditF2.setEnabled(True)
             self.lineEditF2m.setEnabled(True)
@@ -197,11 +199,11 @@ class MainWindow(QMainWindow):
 
     def plot_lines(self, text):
 
-        top = self.iono.get_extent()[3]
-        bottom = self.iono.get_extent()[2]
-
         if self.iono is None:
             return
+
+        top = self.iono.get_extent()[3]
+        bottom = self.iono.get_extent()[2]
 
         foE = self.lineEditE.text().strip()
 
@@ -304,7 +306,10 @@ class MainWindow(QMainWindow):
                     self.ax.imshow(data, cmap=cmap, interpolation='nearest',
                                    extent=extent, aspect='auto')
 
-                    self.ax.set_xticklabels(self.iono.get_freq_labels())
+                    tics = self.iono.get_freq_tics()
+                    labels = self.iono.get_freq_labels()
+                    self.ax.set_xticks(tics)
+                    self.ax.set_xticklabels(labels)
 
                     self.setWindowTitle(self.program_name + " - " + file_name)
                     self.canvas.draw()
@@ -356,8 +361,15 @@ class MainWindow(QMainWindow):
         for (dp, dn, fn) in walk(directory):
             filenames.extend(fn)
             break
+
         filenames.sort()
-        filenames = list(filter(lambda s: s.endswith('.ion'), filenames))
+        tester = IonoTester()
+        result = []
+        for filename in filenames:
+            class_name = tester.examine(directory+'/'+filename)['class_name']
+            if class_name != 'Unknown':
+                result.append(filename)
+
         return filenames
 
     def load_text_info(self):
@@ -471,15 +483,11 @@ class MainWindow(QMainWindow):
         msg.exec_()
 
     def show_about(self):
-        about = """
-        IonogramViewer2 version 1.3 pre
+        about = '\n\n© 2018-2019 Oleksandr Bogomaz\no.v.bogomaz1985@gmail.com'
 
-        © 2018-2019 Oleksandr Bogomaz
-        email: o.v.bogomaz1985@gmail.com
-        """
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
-        msg.setText(about)
+        msg.setText(self.program_name + about)
         msg.setWindowTitle("About")
         msg.show()
         msg.exec_()
