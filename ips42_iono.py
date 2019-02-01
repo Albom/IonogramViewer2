@@ -1,12 +1,13 @@
 
 from math import sqrt, log
 from struct import unpack
+from iono import Iono
 
 
-class Ips42Iono:
+class Ips42Iono(Iono):
 
     def __init__(self):
-        self.data = None
+        super().__init__()
 
     def load(self, file_name):
         with open(file_name, 'rb') as file:
@@ -26,9 +27,6 @@ class Ips42Iono:
                     self.data[alt][f] = 0 if bit else -1
 
         self.data[0][0] = 1
-
-    def get_data(self):
-        return self.data
 
     def get_extent(self):
         left = 0

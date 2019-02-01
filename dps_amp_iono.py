@@ -1,13 +1,12 @@
 from datetime import datetime
+from iono import Iono
 
 
-class DpsAmpIono:
+class DpsAmpIono(Iono):
 
     def __init__(self):
-        self.date = None
-        self.station_name = None
+        super().__init__()
         self.ursi_code = None
-        self.ionosonde_model = None
 
     def load(self, file_name):
 
@@ -49,9 +48,6 @@ class DpsAmpIono:
             sign = -1 if float(data['Pol'][i]) > 0 else 1
             self.data[self.n_rang-i_rang-1][i_freq] = float(amp)*sign
 
-    def get_data(self):
-        return self.data
-
     def get_extent(self):
         left = self.frequencies[0]
         right = self.frequencies[-1]
@@ -65,12 +61,6 @@ class DpsAmpIono:
     def get_freq_labels(self):
         return ['{:.1f}'.format(i) for i in range(int(self.frequencies[0]),
                                                   int(self.frequencies[-1])+1)]
-
-    def freq_to_coord(self, freq):
-        return float(freq)
-
-    def coord_to_freq(self, coord):
-        return float(coord)
 
 
 if __name__ == '__main__':
