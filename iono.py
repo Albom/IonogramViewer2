@@ -11,7 +11,7 @@ class Iono:
         return self.data
 
     def freq_to_coord(self, freq):
-        return freq
+        return float(freq)
 
     def coord_to_freq(self, coord):
-        return coord
+        return float(coord)
