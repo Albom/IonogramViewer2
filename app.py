@@ -432,61 +432,74 @@ class MainWindow(QMainWindow):
 
     def save_file(self):
         if self.file_name:
-            with open(self.file_name + '.STD', 'w') as file:
-                foE = self.lineEditE.text().strip()
-                try:
-                    foE = float(foE)
-                    if abs(foE - 99.0) < 1.0 or abs(foE) < 0.1:
-                        foE = '99.0'
-                except ValueError:
-                    foE = '99.0'
+            self.save_std(self.file_name + '.STD')
+            self.save_image(self.file_name + '.png')
+            self.statusbar.showMessage('File is saved.')
 
-                fohE = ''
-                for i in range(self.listWidgetE.count()):
+
+    def save_std(self, filename):
+        with open(filename, 'w') as file:
+            foE = self.lineEditE.text().strip()
+            try:
+                foE = float(foE)
+                if abs(foE - 99.0) < 1.0 or abs(foE) < 0.1:
+                    foE = '99.0'
+            except ValueError:
+                foE = '99.0'
+
+            fohE = ''
+            for i in range(self.listWidgetE.count()):
                     fohE += self.listWidgetE.item(i).text() + '\n'
 
-                foF1 = self.lineEditF1.text().strip()
-                try:
-                    foF1 = float(foF1)
-                    if abs(foF1 - 99.0) < 1.0 or abs(foF1) < 0.1:
-                        foF1 = '99.0'
-                except ValueError:
+            foF1 = self.lineEditF1.text().strip()
+            try:
+                foF1 = float(foF1)
+                if abs(foF1 - 99.0) < 1.0 or abs(foF1) < 0.1:
                     foF1 = '99.0'
+            except ValueError:
+                foF1 = '99.0'
 
-                fohF1 = ''
-                for i in range(self.listWidgetF1.count()):
-                    fohF1 += self.listWidgetF1.item(i).text() + '\n'
+            fohF1 = ''
+            for i in range(self.listWidgetF1.count()):
+                fohF1 += self.listWidgetF1.item(i).text() + '\n'
 
-                foF2 = self.lineEditF2.text().strip()
-                try:
-                    foF2 = float(foF2)
-                    if abs(foF2 - 99.0) < 1.0 or abs(foF2) < 0.1:
-                        foF2 = '99.0'
-                except ValueError:
+            foF2 = self.lineEditF2.text().strip()
+            try:
+                foF2 = float(foF2)
+                if abs(foF2 - 99.0) < 1.0 or abs(foF2) < 0.1:
                     foF2 = '99.0'
+            except ValueError:
+                foF2 = '99.0'
 
-                fohF2 = ''
-                for i in range(self.listWidgetF2.count()):
-                    fohF2 += self.listWidgetF2.item(i).text() + '\n'
+            fohF2 = ''
+            for i in range(self.listWidgetF2.count()):
+                fohF2 += self.listWidgetF2.item(i).text() + '\n'
 
-                file.write(self.station_name + '\n')
-                file.write(self.coordinates + '\n')
-                file.write(self.date + '\n')
+            file.write(self.station_name + '\n')
+            file.write(self.coordinates + '\n')
+            file.write(self.date + '\n')
 
-                file.write(str(foE) + '\n')
-                file.write(str(fohE))
-                file.write('END\n')
+            file.write(str(foE) + '\n')
+            file.write(str(fohE))
+            file.write('END\n')
 
-                file.write(str(foF1) + '\n')
-                file.write(str(fohF1))
-                file.write('END\n')
+            file.write(str(foF1) + '\n')
+            file.write(str(fohF1))
+            file.write('END\n')
 
-                file.write(str(foF2) + '\n')
-                file.write(str(fohF2))
-                file.write('END\n')
+            file.write(str(foF2) + '\n')
+            file.write(str(fohF2))
+            file.write('END\n')
 
-            self.statusbar.showMessage('File is saved.')
-            self.figure.savefig(self.file_name + '.png')
+    def save_image(self, filename, **kwargs):
+            width = 10 if not 'width' in kwargs else kwargs['width']
+            height = 5.5 if not 'height' in kwargs else kwargs['height']
+            dpi = 100 if not 'dpi' in kwargs else kwargs['dpi']
+            old_size = self.figure.get_size_inches()
+            self.figure.set_size_inches(width, height)
+            self.figure.savefig(filename, dpi=dpi)
+            self.figure.set_size_inches(old_size)
+            self.canvas.draw()
 
     def show_error(self, message):
         msg = QMessageBox()
