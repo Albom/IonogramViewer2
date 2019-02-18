@@ -61,7 +61,9 @@ class MainWindow(QMainWindow):
             w.setContextMenuPolicy(Qt.CustomContextMenu)
             w.customContextMenuRequested.connect(self.delete_menu)
 
-        lineEdits = [self.lineEditE, self.lineEditF1, self.lineEditF2]
+        lineEdits = [
+            self.lineEditE, self.lineEditF1, self.lineEditF2,
+            self.lineEditEm, self.lineEditF1m, self.lineEditF2m]
         for e in lineEdits:
             e.textChanged.connect(self.plot_lines)
 
@@ -88,6 +90,10 @@ class MainWindow(QMainWindow):
         self.f1_critical = None
         self.f2_critical = None
 
+        self.e_min = None
+        self.f1_min = None
+        self.f2_min = None
+
         self.iono = None
         self.file_name = None
 
@@ -96,6 +102,10 @@ class MainWindow(QMainWindow):
         self.lineEditE.setText('')
         self.lineEditF1.setText('')
         self.lineEditF2.setText('')
+
+        self.lineEditEm.setText('')
+        self.lineEditF1m.setText('')
+        self.lineEditF2m.setText('')
 
         self.listWidgetE.clear()
         self.listWidgetF1.clear()
@@ -144,8 +154,8 @@ class MainWindow(QMainWindow):
         if event.ydata and event.xdata:
             f = self.iono.coord_to_freq(event.xdata)
             h = event.ydata
-            s = '{:-5.2f} {:-5.1f}'.format(f, h)
-            f = '{:-5.2f}'.format(f)
+            s = '{:5.2f} {:5.1f}'.format(f, h)
+            f = '{:<5.2f}'.format(f).strip()
             if event.button == 1:
                 if self.mode == 0:  # F2
                     self.listWidgetF2.addItem(s)
@@ -160,6 +170,13 @@ class MainWindow(QMainWindow):
                     self.lineEditF1.setText(f)
                 elif self.mode == 2:  # E
                     self.lineEditE.setText(f)
+            elif event.button == 2:
+                if self.mode == 0:  # F2
+                    self.lineEditF2m.setText(f)
+                elif self.mode == 1:  # F1
+                    self.lineEditF1m.setText(f)
+                elif self.mode == 2:  # E
+                    self.lineEditEm.setText(f)
             self.plot_scatter()
 
     def plot_scatter(self):
@@ -203,6 +220,8 @@ class MainWindow(QMainWindow):
         if self.iono is None:
             return
 
+        left = self.iono.get_extent()[0]
+        right = self.iono.get_extent()[1]
         top = self.iono.get_extent()[3]
         bottom = self.iono.get_extent()[2]
 
@@ -213,7 +232,7 @@ class MainWindow(QMainWindow):
         except ValueError:
             foE = 99.0
 
-        if (foE > 1) and (foE < 22.6):
+        if (foE > left) and (foE < right):
             if self.e_critical is not None:
                 self.e_critical.remove()
                 self.e_critical = None
@@ -233,7 +252,7 @@ class MainWindow(QMainWindow):
         except ValueError:
             foF1 = 99.0
 
-        if (foF1 > 1) and (foF1 < 22.6):
+        if (foF1 > left) and (foF1 < right):
             if self.f1_critical is not None:
                 self.f1_critical.remove()
                 self.f1_critical = None
@@ -252,7 +271,7 @@ class MainWindow(QMainWindow):
         except ValueError:
             foF2 = 99.0
 
-        if (foF2 > 1) and (foF2 < 22.6):
+        if (foF2 > left) and (foF2 < right):
             if self.f2_critical is not None:
                 self.f2_critical.remove()
                 self.f2_critical = None
@@ -264,13 +283,79 @@ class MainWindow(QMainWindow):
                 self.f2_critical.remove()
                 self.f2_critical = None
 
+        f_min_F2 = self.lineEditF2m.text().strip()
+        try:
+            f_min_F2 = float(f_min_F2)
+        except ValueError:
+            f_min_F2 = 99.0
+
+        if (f_min_F2 > left) and (f_min_F2 < right):
+            if self.f2_min is not None:
+                self.f2_min.remove()
+                self.f2_min = None
+
+            f = self.iono.freq_to_coord(f_min_F2)
+            self.f2_min, = self.ax.plot(
+                [f, f],
+                [bottom, top],
+                c='r',
+                linestyle='--')
+        else:
+            if self.f2_min is not None:
+                self.f2_min.remove()
+                self.f2_min = None
+
+        f_min_F1 = self.lineEditF1m.text().strip()
+        try:
+            f_min_F1 = float(f_min_F1)
+        except ValueError:
+            f_min_F1 = 99.0
+
+        if (f_min_F1 > left) and (f_min_F1 < right):
+            if self.f1_min is not None:
+                self.f1_min.remove()
+                self.f1_min = None
+
+            f = self.iono.freq_to_coord(f_min_F1)
+            self.f1_min, = self.ax.plot(
+                [f, f],
+                [bottom, top],
+                c='c',
+                linestyle='--')
+        else:
+            if self.f1_min is not None:
+                self.f1_min.remove()
+                self.f1_min = None
+
+        f_min_E = self.lineEditEm.text().strip()
+        try:
+            f_min_E = float(f_min_E)
+        except ValueError:
+            f_min_E = 99.0
+
+        if (f_min_E > left) and (f_min_E < right):
+            if self.e_min is not None:
+                self.e_min.remove()
+                self.e_min = None
+
+            f = self.iono.freq_to_coord(f_min_E)
+            self.e_min, = self.ax.plot(
+                [f, f],
+                [bottom, top],
+                c='g',
+                linestyle='--')
+        else:
+            if self.e_min is not None:
+                self.e_min.remove()
+                self.e_min = None
+
         self.canvas.draw()
 
     def onmove(self, event):
         if event.ydata and event.xdata:
             f = self.iono.coord_to_freq(event.xdata)
             h = event.ydata
-            self.statusbar.showMessage('f={:-5.2f}  h\'={:-5.1f}'.format(f, h))
+            self.statusbar.showMessage('f={:5.2f}  h\'={:5.1f}'.format(f, h))
             if not self.is_cross:
                 QApplication.setOverrideCursor(Qt.CrossCursor)
                 self.is_cross = True
@@ -436,7 +521,6 @@ class MainWindow(QMainWindow):
             self.save_image(self.file_name + '.png')
             self.statusbar.showMessage('File is saved.')
 
-
     def save_std(self, filename):
         with open(filename, 'w') as file:
             foE = self.lineEditE.text().strip()
@@ -492,9 +576,9 @@ class MainWindow(QMainWindow):
             file.write('END\n')
 
     def save_image(self, filename, **kwargs):
-            width = 10 if not 'width' in kwargs else kwargs['width']
-            height = 5.5 if not 'height' in kwargs else kwargs['height']
-            dpi = 100 if not 'dpi' in kwargs else kwargs['dpi']
+            width = 10 if 'width' not in kwargs else kwargs['width']
+            height = 5.5 if 'height' not in kwargs else kwargs['height']
+            dpi = 100 if 'dpi' not in kwargs else kwargs['dpi']
             old_size = self.figure.get_size_inches()
             self.figure.set_size_inches(width, height)
             title = '{}, {}, {}'.format(
