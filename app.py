@@ -497,7 +497,13 @@ class MainWindow(QMainWindow):
             dpi = 100 if not 'dpi' in kwargs else kwargs['dpi']
             old_size = self.figure.get_size_inches()
             self.figure.set_size_inches(width, height)
+            title = '{}, {}, {}'.format(
+                self.station_name,
+                self.coordinates,
+                self.date)
+            plt.title(title)
             self.figure.savefig(filename, dpi=dpi)
+            plt.title('')
             self.figure.set_size_inches(old_size)
             self.canvas.draw()
 
