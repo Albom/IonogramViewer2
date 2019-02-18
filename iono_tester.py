@@ -22,8 +22,11 @@ class IonoTester:
 
         file_size = path.getsize(filename)
 
-        with open(filename) as f:
-            first_line = f.readline()
+        try:
+            with open(filename) as f:
+                first_line = f.readline()
+        except UnicodeDecodeError:
+            first_line = ''
 
         keys = self.FILE_FORMATS.keys()
         for key in keys:
@@ -54,13 +57,15 @@ class IonoTester:
         if all_points != 0:
             self.probability = max_points/all_points
 
+        p = 1.0 if self.class_name == 'Unknown' else self.probability
         return {
             'class_name': self.class_name,
-            'probability': self.probability}
+            'probability': p}
 
 
 if __name__ == '__main__':
     tester = IonoTester()
     ips = tester.examine('./examples/ips42/00h30m.ion')
     dps = tester.examine('./examples/dps_amp/00_00.txt')
-    print(ips, dps, sep='\n')
+    py = tester.examine('./iono_tester.py')
+    print(ips, dps, py, sep='\n')

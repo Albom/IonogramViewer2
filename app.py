@@ -284,12 +284,19 @@ class MainWindow(QMainWindow):
         self.open_file(file_name)
 
     def open_file(self, file_name):
+        self.iono = None
+        self.file_name = ''
+        self.figure.clear()
+        self.ax = None
+        self.canvas.draw()
+
+        self.setWindowTitle(self.program_name)
         if file_name:
             self.clear_all()
 
             tester = IonoTester()
             class_name = tester.examine(file_name)['class_name']
-            if class_name:
+            if class_name != 'Unknown':
                 class_ = globals()[class_name]
                 self.iono = class_()
                 self.iono.load(file_name)
@@ -298,7 +305,6 @@ class MainWindow(QMainWindow):
 
                     self.file_name = file_name
 
-                    self.figure.clear()
                     self.ax = self.figure.add_subplot(111)
 
                     extent = self.iono.get_extent()
@@ -319,6 +325,8 @@ class MainWindow(QMainWindow):
                     self.date = '2017 3 17 0 0 0'
 
                     self.load_text_info()
+            else:
+                self.show_error('File format is not supported.')
 
     def open_next_file(self):
         if self.file_name:
@@ -370,7 +378,7 @@ class MainWindow(QMainWindow):
             if class_name != 'Unknown':
                 result.append(filename)
 
-        return filenames
+        return result
 
     def load_text_info(self):
         try:
