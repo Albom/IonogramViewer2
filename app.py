@@ -38,7 +38,8 @@ class MainWindow(QMainWindow):
             self.actionFirst: self.open_first_file,
             self.actionLast: self.open_last_file,
             self.actionReload: self.reopen_file,
-            self.actionChangeLayer: self.change_layer}
+            self.actionChangeLayer: self.change_layer,
+            self.actionClose: self.close_file}
 
         for key, action in actions.items():
             key.triggered.connect(action)
@@ -283,12 +284,17 @@ class MainWindow(QMainWindow):
         file_name, _ = QFileDialog.getOpenFileName(self)
         self.open_file(file_name)
 
-    def open_file(self, file_name):
+    def close_file(self):
+        self.clear_all()
         self.iono = None
         self.file_name = ''
         self.figure.clear()
         self.ax = None
         self.canvas.draw()
+
+    def open_file(self, file_name):
+
+        self.close_file()
 
         self.setWindowTitle(self.program_name)
         if file_name:

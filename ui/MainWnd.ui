@@ -41,6 +41,7 @@
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
+    <addaction name="actionClose"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -398,6 +399,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Tab</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="toolTip">
+    <string>Close (Ctrl+W)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
  </widget>
