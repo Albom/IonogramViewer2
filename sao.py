@@ -1,4 +1,7 @@
 
+from math import ceil
+
+
 class GeophysicalConstants:
     GYROFREQUENCY = 0
     DIP_ANGLE = 1
@@ -17,6 +20,17 @@ class PrefaceAA:
         self.hour = ''.join(line[13:15])
         self.minutes = ''.join(line[15:17])
         self.seconds = ''.join(line[17:19])
+
+    def __str__(self):
+        return ''.join((
+            self.version,
+            self.year,
+            self.day_of_year,
+            self.month,
+            self.day_of_month,
+            self.hour,
+            self.minutes,
+            self.seconds))
 
 
 class PrefaceFF(PrefaceAA):
@@ -60,6 +74,37 @@ class PrefaceFF(PrefaceAA):
             self.online_printer = 'color'
         self.thresholded = ''.join(line[74:76])
         self.extra_attenuation = line[76] == '1'
+
+    def __str__(self):
+        return super().__str__() + ''.join((
+            self.receiver_id,
+            self.transmitter_id,
+            self.dps_schedule,
+            self.dps_program,
+            self.start_frequency,
+            self.coarse_frequency,
+            self.stop_frequency,
+            self.dps_frequency,
+            '1' if self.multiplexing_disabled else '0',
+            self.number_of_small_steps,
+            self.dps_phase_code,
+            '1' if self.alternative_antenna_setup else '0',
+            self.dps_antenna_options,
+            self.fft_samples,
+            '1' if self.silent_mode else '0',
+            self.pulse_repetation_rate,
+            self.start_range,
+            {2.5: '2', 5: '5', 10: 'A'}[self.range_increment],
+            self.number_of_ranges,
+            self.scan_delay,
+            self.gain,
+            '1' if self.frequency_search_enabled else '0',
+            self.operating_mode,
+            '1' if self.artist_enabled else '0',
+            self.data_format,
+            {'no printer': '0', 'b/w': '1', 'color': '2'}[self.online_printer],
+            self.thresholded,
+            '1' if self.extra_attenuation else '0',))
 
 
 class PrefaceFE(PrefaceAA):
@@ -376,7 +421,6 @@ class Sao():
                 else:
                     col += 1
 
-
         # group 41
         num = self.data_file_index[40]
         if num > 0:
@@ -621,6 +665,117 @@ class Sao():
             self.descriptive_letters)
         return result
 
+    def write(self, filename):
+        data = []
+
+        data.append(Sao.convert(self.data_file_index, '{:3d}', 40))
+        data.append(Sao.convert(self.geophysical_constants, '{:7.3f}', 16))
+        data.append(str.format('{:120s}', self.system_description))
+        data.append(str(self.timestamp_and_settings))
+        data.append(Sao.convert(self.scaled_characteristics, '{:8.3f}', 15))
+        data.append(Sao.convert(self.analysis_flags, '{:2d}', 60))
+        data.append(Sao.convert(self.doppler, '{:7.3f}', 16))
+
+        data.append(Sao.convert(self.f2_o_heights_virtual, '{:8.3f}', 15))
+        data.append(Sao.convert(self.f2_o_heights_true, '{:8.3f}', 15))
+        data.append(Sao.convert(self.f2_o_amplitudes, '{:3d}', 40))
+        data.append(Sao.convert(self.f2_o_doppler_numbers, '{:1d}', 120))
+        data.append(Sao.convert(self.f2_o_frequencies, '{:8.3f}', 15))
+
+        data.append(Sao.convert(self.f1_o_heights_virtual, '{:8.3f}', 15))
+        data.append(Sao.convert(self.f1_o_heights_true, '{:8.3f}', 15))
+        data.append(Sao.convert(self.f1_o_amplitudes, '{:3d}', 40))
+        data.append(Sao.convert(self.f1_o_doppler_numbers, '{:1d}', 120))
+        data.append(Sao.convert(self.f1_o_frequencies, '{:8.3f}', 15))
+
+        data.append(Sao.convert(self.e_o_heights_virtual, '{:8.3f}', 15))
+        data.append(Sao.convert(self.e_o_heights_true, '{:8.3f}', 15))
+        data.append(Sao.convert(self.e_o_amplitudes, '{:3d}', 40))
+        data.append(Sao.convert(self.e_o_doppler_numbers, '{:1d}', 120))
+        data.append(Sao.convert(self.e_o_frequencies, '{:8.3f}', 15))
+
+        data.append(Sao.convert(self.f2_x_heights_virtual, '{:8.3f}', 15))
+        data.append(Sao.convert(self.f2_x_amplitudes, '{:3d}', 40))
+        data.append(Sao.convert(self.f2_x_doppler_numbers, '{:1d}', 120))
+        data.append(Sao.convert(self.f2_x_frequencies, '{:8.3f}', 15))
+
+        data.append(Sao.convert(self.f1_x_heights_virtual, '{:8.3f}', 15))
+        data.append(Sao.convert(self.f1_x_amplitudes, '{:3d}', 40))
+        data.append(Sao.convert(self.f1_x_doppler_numbers, '{:1d}', 120))
+        data.append(Sao.convert(self.f1_x_frequencies, '{:8.3f}', 15))
+
+        data.append(Sao.convert(self.e_x_heights_virtual, '{:8.3f}', 15))
+        data.append(Sao.convert(self.e_x_amplitudes, '{:3d}', 40))
+        data.append(Sao.convert(self.e_x_doppler_numbers, '{:1d}', 120))
+        data.append(Sao.convert(self.e_x_frequencies, '{:8.3f}', 15))
+
+        data.append(Sao.convert(self.median_amplitudes_f, '{:3d}', 40))
+        data.append(Sao.convert(self.median_amplitudes_e, '{:3d}', 40))
+        data.append(Sao.convert(self.median_amplitudes_es, '{:3d}', 40))
+
+        data.append(Sao.convert(
+            Sao.to_scientific(self.true_height_coeff_f2, 11, 6), '{:11s}', 10))
+        data.append(Sao.convert(
+            Sao.to_scientific(self.true_height_coeff_f1, 11, 6), '{:11s}', 10))
+        data.append(Sao.convert(
+            Sao.to_scientific(self.true_height_coeff_e, 11, 6), '{:11s}', 10))
+
+        data.append(Sao.convert(
+            Sao.to_scientific(self.quazi_parabolic_segments, 20, 12, 2),
+            '{:20s}', 6))
+
+        data.append(Sao.convert(self.edit_flags, '{:1d}', 120))
+
+        data.append(Sao.convert(
+            Sao.to_scientific(self.valley_description, 11, 6), '{:11s}', 10))
+
+        data.append(Sao.convert(self.es_o_heights_virtual, '{:8.3f}', 15))
+        data.append(Sao.convert(self.es_o_amplitudes, '{:3d}', 40))
+        data.append(Sao.convert(self.es_o_doppler_numbers, '{:1d}', 120))
+        data.append(Sao.convert(self.es_o_frequencies, '{:8.3f}', 15))
+
+        data.append(Sao.convert(self.true_heights, '{:8.3f}', 15))
+        data.append(Sao.convert(self.plasma_frequencies, '{:8.3f}', 15))
+        data.append(Sao.convert(
+            Sao.to_scientific(self.electron_densities, 8, 3), '{:8s}', 15))
+
+        data.append(Sao.convert(self.qualifying_letters, '{:1s}', 120))
+        data.append(Sao.convert(self.descriptive_letters, '{:1s}', 120))
+
+        # print(self.timestamp_and_settings)
+        with open(filename, 'w') as file:
+            file.write('\n'.join(filter(lambda d: len(d) > 0, data)))
+
+    @staticmethod
+    def to_scientific(array, n_places, n_digits, n_exp=1):
+        result = []
+        format_in = '{:' + str(n_places+3) + '.' + str(n_digits+3) + 'E}'
+        format_mantissa = '{:+' + str(n_digits+3) + '.' + str(n_digits) + 'f}'
+        format_out = '{}E{:+' + str(n_exp) + 'd}'
+        for x in array:
+            s = str.format(format_in, float(x))
+            mantissa, exponent = s.split('E')
+            mantissa = str.format(format_mantissa, float(mantissa) / 10)
+            mantissa = ('-' if mantissa[0] == '-' else '0') + mantissa[2:]
+            exponent = int(exponent) + 1
+            result.append(str.format(format_out, mantissa, exponent))
+        return result
+
+    @staticmethod
+    def convert(array, format, n_col):
+        result = ''
+        size = len(array)
+
+        col = 0
+        for i, e in enumerate(array):
+            result += str.format(format, e)
+            if col > n_col-2 and i != size-1:
+                result += '\n'
+                col = 0
+            else:
+                col += 1
+        return result
+
     @staticmethod
     def get_sao_version(num):
         names = {0: '3', 1: '3.1', 2: '4.0', 3: '4.1', 4: '4.2', 5: '4.3'}
@@ -723,6 +878,7 @@ class Sao():
 if __name__ == '__main__':
     sao = Sao()
     sao.load('./examples/sao/test.sao')
-    print(sao)
+    sao.write('out.txt')
+    #print(sao)
     # with open('out.txt', 'w') as f:
     #     f.write(str(sao))
