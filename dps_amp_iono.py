@@ -62,6 +62,8 @@ class DpsAmpIono(Iono):
         return ['{:.1f}'.format(i) for i in range(int(self.frequencies[0]),
                                                   int(self.frequencies[-1])+1)]
 
+    def get_ursi_code(self):
+        return self.ursi_code
 
 if __name__ == '__main__':
     iono = DpsAmpIono()

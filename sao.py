@@ -742,7 +742,6 @@ class Sao():
         data.append(Sao.convert(self.qualifying_letters, '{:1s}', 120))
         data.append(Sao.convert(self.descriptive_letters, '{:1s}', 120))
 
-        # print(self.timestamp_and_settings)
         with open(filename, 'w') as file:
             file.write('\n'.join(filter(lambda d: len(d) > 0, data)))
 

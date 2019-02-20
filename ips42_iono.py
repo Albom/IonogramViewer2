@@ -1,6 +1,7 @@
 
 from math import sqrt, log
 from struct import unpack
+from datetime import datetime
 from iono import Iono
 
 
@@ -8,6 +9,8 @@ class Ips42Iono(Iono):
 
     def __init__(self):
         super().__init__()
+        # TODO add date loading from file
+        self.date = datetime.now()
 
     def load(self, file_name):
         with open(file_name, 'rb') as file:

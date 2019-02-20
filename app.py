@@ -1,7 +1,7 @@
 import sys
 from os import walk, path
-from math import sqrt, log
 from PyQt5 import uic
+from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QApplication, \
     QFileDialog, QMenu, QMessageBox
@@ -17,6 +17,9 @@ from iono_tester import IonoTester
 from karazin_iono import KarazinIono
 from ips42_iono import Ips42Iono
 from dps_amp_iono import DpsAmpIono
+
+
+DATE_TIME_FORMAT = 'yyyy-MM-dd hh:mm'
 
 
 class MainWindow(QMainWindow):
@@ -40,7 +43,6 @@ class MainWindow(QMainWindow):
             self.actionReload: self.reopen_file,
             self.actionChangeLayer: self.change_layer,
             self.actionClose: self.close_file}
-
         for key, action in actions.items():
             key.triggered.connect(action)
 
@@ -48,6 +50,8 @@ class MainWindow(QMainWindow):
         self.radioButtonF2.toggled.connect(lambda: self.change_mode(0))
         self.radioButtonF1.toggled.connect(lambda: self.change_mode(1))
         self.radioButtonE.toggled.connect(lambda: self.change_mode(2))
+
+        self.pngDefaultButton.clicked.connect(self.set_default_image_param)
 
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
@@ -67,10 +71,25 @@ class MainWindow(QMainWindow):
         for e in lineEdits:
             e.textChanged.connect(self.plot_lines)
 
+        self.timeZoneComboBox.addItems([str.format('{:>+3d}' if i != 0 else '{:>3d}', i) for i in range(-11, 13)])
+        font = QFont("Monospace");
+        font.setStyleHint(QFont.TypeWriter);
+        self.timeZoneComboBox.setFont(font)
+
+        self.properties_of_iono = [self.stationNameEdit,
+            self.timeZoneComboBox, self.ursiCodeEdit, self.dateTimeEdit]
+
+        self.dateTimeEdit.setDisplayFormat(DATE_TIME_FORMAT)
+
         self.clear_all()
 
         self.setWindowTitle(self.program_name)
         self.showMaximized()
+
+    def set_default_image_param(self):
+        self.pngDpiSpinBox.setValue(100)
+        self.pngWidthSpinBox.setValue(10)
+        self.pngHeightSpinBox.setValue(6)
 
     def change_layer(self):
         mode = self.mode+1 if self.mode < 2 else 0
@@ -112,6 +131,7 @@ class MainWindow(QMainWindow):
         self.listWidgetF2.clear()
 
         self.radioButtonF2.setChecked(True)
+        [e.setEnabled(False) for e in self.properties_of_iono]
 
     def delete_menu(self, point):
         if self.sender().count():
@@ -408,12 +428,22 @@ class MainWindow(QMainWindow):
                     self.ax.set_xticks(tics)
                     self.ax.set_xticklabels(labels)
 
+                    plt.tight_layout()
                     self.setWindowTitle(self.program_name + " - " + file_name)
                     self.canvas.draw()
 
-                    self.station_name = 'UAC'
-                    self.coordinates = '-65.25 -64.25 0.97 -59 0'
-                    self.date = '2017 3 17 0 0 0'
+                    self.stationNameEdit.setText(self.iono.get_station_name())
+                    self.ursiCodeEdit.setText(self.iono.get_ursi_code() if 'ursi_code' in vars(self.iono) else '')
+                    self.dateTimeEdit.setDateTime(self.iono.get_date())
+
+                    timeZone = self.iono.get_timezone()
+                    position = self.timeZoneComboBox.findText(str.format('{:>+3d}' if timeZone != 0 else '{:>3d}', timeZone))
+                    self.timeZoneComboBox.setCurrentIndex(position)
+                    [e.setEnabled(True) for e in self.properties_of_iono]
+
+                    # self.station_name = 'UAC'
+                    # self.coordinates = '-65.25 -64.25 0.97 -59 0'
+                    # self.date = '2017 3 17 0 0 0'
 
                     self.load_text_info()
             else:
@@ -517,8 +547,16 @@ class MainWindow(QMainWindow):
 
     def save_file(self):
         if self.file_name:
-            self.save_std(self.file_name + '.STD')
-            self.save_image(self.file_name + '.png')
+            # self.save_std(self.file_name + '.STD')
+            if self.pngCheckBox.isChecked():
+                width = self.pngWidthSpinBox.value()
+                height = self.pngHeightSpinBox.value()
+                dpi = self.pngDpiSpinBox.value()
+                self.save_image(
+                    self.file_name + '.png',
+                    width=width,
+                    height=height,
+                    dpi=dpi)
             self.statusbar.showMessage('File is saved.')
 
     def save_std(self, filename):
@@ -581,14 +619,19 @@ class MainWindow(QMainWindow):
             dpi = 100 if 'dpi' not in kwargs else kwargs['dpi']
             old_size = self.figure.get_size_inches()
             self.figure.set_size_inches(width, height)
-            title = '{}, {}, {}'.format(
-                self.station_name,
-                self.coordinates,
-                self.date)
+            ursiCode = self.ursiCodeEdit.text().strip()
+            timeZone = self.timeZoneComboBox.currentText().strip()
+            title = '{}{}, {} ({})'.format(
+                self.stationNameEdit.text().strip(),
+                ' (' + ursiCode + ')' if len(ursiCode) > 0 else '',
+                self.dateTimeEdit.dateTime().toString(DATE_TIME_FORMAT),
+                'UTC' if timeZone == '0' else 'UTC'+timeZone)
             plt.title(title)
-            self.figure.savefig(filename, dpi=dpi)
+            plt.tight_layout()
+            self.figure.savefig(filename, dpi=dpi)#, bbox_inches='tight')
             plt.title('')
             self.figure.set_size_inches(old_size)
+            plt.tight_layout()
             self.canvas.draw()
 
     def show_error(self, message):
