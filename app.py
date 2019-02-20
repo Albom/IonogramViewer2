@@ -52,6 +52,7 @@ class MainWindow(QMainWindow):
         self.radioButtonE.toggled.connect(lambda: self.change_mode(2))
 
         self.pngDefaultButton.clicked.connect(self.set_default_image_param)
+        self.pngCheckBox.stateChanged.connect(self.png_state_changed)
 
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
@@ -85,6 +86,13 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(self.program_name)
         self.showMaximized()
+
+    def png_state_changed(self, state):
+        s = state == Qt.Checked
+        elements = [self.pngDefaultButton, self.pngWidthSpinBox,
+            self.pngHeightSpinBox, self.pngDpiSpinBox]
+        for e in elements:
+            e.setEnabled(s)
 
     def set_default_image_param(self):
         self.pngDpiSpinBox.setValue(100)
