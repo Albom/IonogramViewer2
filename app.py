@@ -78,7 +78,9 @@ class MainWindow(QMainWindow):
         self.timeZoneComboBox.setFont(font)
 
         self.properties_of_iono = [self.stationNameEdit,
-            self.timeZoneComboBox, self.ursiCodeEdit, self.dateTimeEdit]
+            self.timeZoneComboBox, self.ursiCodeEdit, self.dateTimeEdit,
+            self.latLineEdit, self.longLineEdit, self.sunspotNumberLineEdit,
+            self.gyrofrequencyLineEdit]
 
         self.dateTimeEdit.setDisplayFormat(DATE_TIME_FORMAT)
 
