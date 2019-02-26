@@ -329,7 +329,7 @@
    <property name="minimumSize">
     <size>
      <width>220</width>
-     <height>559</height>
+     <height>584</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -439,84 +439,6 @@
            <number>5</number>
           </property>
           <item row="6" column="1">
-           <widget class="QSpinBox" name="pngHeightSpinBox">
-            <property name="minimum">
-             <number>5</number>
-            </property>
-            <property name="maximum">
-             <number>10</number>
-            </property>
-            <property name="value">
-             <number>6</number>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>dpi</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QCheckBox" name="checkBox">
-            <property name="text">
-             <string>SAO version 4.3</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="QCheckBox" name="pngCheckBox">
-            <property name="text">
-             <string>PNG image (up to 10 x 10 inches)</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QCheckBox" name="checkBox_3">
-            <property name="text">
-             <string>STD file</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0" colspan="2">
-           <widget class="QPushButton" name="pngDefaultButton">
-            <property name="text">
-             <string>Set default values</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="Line" name="line">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QSpinBox" name="pngDpiSpinBox">
-            <property name="minimum">
-             <number>100</number>
-            </property>
-            <property name="maximum">
-             <number>300</number>
-            </property>
-            <property name="singleStep">
-             <number>50</number>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Width (inches)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
            <widget class="QSpinBox" name="pngWidthSpinBox">
             <property name="minimum">
              <number>5</number>
@@ -529,8 +451,15 @@
             </property>
            </widget>
           </item>
+          <item row="9" column="0" colspan="2">
+           <widget class="QPushButton" name="pngDefaultButton">
+            <property name="text">
+             <string>Set default values</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="0" colspan="2">
-           <widget class="QCheckBox" name="checkBox_2">
+           <widget class="QCheckBox" name="sao5CheckBox">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -539,10 +468,81 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
              <string>Height (inches)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Width (inches)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="2">
+           <widget class="QCheckBox" name="pngCheckBox">
+            <property name="text">
+             <string>PNG image (up to 10 x 10 inches)</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="QSpinBox" name="pngDpiSpinBox">
+            <property name="minimum">
+             <number>100</number>
+            </property>
+            <property name="maximum">
+             <number>300</number>
+            </property>
+            <property name="singleStep">
+             <number>50</number>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>dpi</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QCheckBox" name="sao4CheckBox">
+            <property name="text">
+             <string>SAO version 4.3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QSpinBox" name="pngHeightSpinBox">
+            <property name="minimum">
+             <number>5</number>
+            </property>
+            <property name="maximum">
+             <number>10</number>
+            </property>
+            <property name="value">
+             <number>6</number>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="stdCheckBox">
+            <property name="text">
+             <string>STD file</string>
             </property>
            </widget>
           </item>
@@ -607,46 +607,10 @@
           <property name="spacing">
            <number>5</number>
           </property>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Date &amp; 
-Time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="latLineEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="0" colspan="2">
-           <widget class="Line" name="line_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="0" colspan="2">
            <widget class="Line" name="line_4">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="longLineEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Time zone</string>
             </property>
            </widget>
           </item>
@@ -665,8 +629,51 @@ Time</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="stationNameEdit">
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="latLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0" colspan="2">
+           <widget class="Line" name="line_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Date &amp; 
+Time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Time zone</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="ursiCodeEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="longLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="gyrofrequencyLineEdit">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -680,44 +687,15 @@ frequency (MHz)</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
-           <widget class="QLineEdit" name="gyrofrequencyLineEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="1">
-           <widget class="QLineEdit" name="sunspotNumberLineEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
+          <item row="9" column="1">
            <widget class="QDateTimeEdit" name="dateTimeEdit">
             <property name="enabled">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="6" column="0" colspan="2">
-           <widget class="Line" name="line_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="0">
-           <widget class="QLabel" name="sunspotNumberLabel">
-            <property name="text">
-             <string>Sunspot 
-number</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="ursiCodeEdit">
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="stationNameEdit">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -730,6 +708,13 @@ number</string>
             </property>
            </widget>
           </item>
+          <item row="10" column="1">
+           <widget class="QComboBox" name="timeZoneComboBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
@@ -737,10 +722,32 @@ number</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="1">
-           <widget class="QComboBox" name="timeZoneComboBox">
+          <item row="7" column="1">
+           <widget class="QLineEdit" name="sunspotNumberLineEdit">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="sunspotNumberLabel">
+            <property name="text">
+             <string>Sunspot 
+number</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="dipAngleLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Dip angle (deg.)</string>
             </property>
            </widget>
           </item>

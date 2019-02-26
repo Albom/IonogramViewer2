@@ -1,5 +1,6 @@
 import sys
 from os import walk, path
+from datetime import datetime, timedelta
 from PyQt5 import uic
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
@@ -80,7 +81,7 @@ class MainWindow(QMainWindow):
         self.properties_of_iono = [self.stationNameEdit,
             self.timeZoneComboBox, self.ursiCodeEdit, self.dateTimeEdit,
             self.latLineEdit, self.longLineEdit, self.sunspotNumberLineEdit,
-            self.gyrofrequencyLineEdit]
+            self.gyrofrequencyLineEdit, self.dipAngleLineEdit]
 
         self.dateTimeEdit.setDisplayFormat(DATE_TIME_FORMAT)
 
@@ -451,10 +452,6 @@ class MainWindow(QMainWindow):
                     self.timeZoneComboBox.setCurrentIndex(position)
                     [e.setEnabled(True) for e in self.properties_of_iono]
 
-                    # self.station_name = 'UAC'
-                    # self.coordinates = '-65.25 -64.25 0.97 -59 0'
-                    # self.date = '2017 3 17 0 0 0'
-
                     self.load_text_info()
             else:
                 self.show_error('File format is not supported.')
@@ -514,9 +511,19 @@ class MainWindow(QMainWindow):
     def load_text_info(self):
         try:
             with open(self.file_name + '.STD', 'r') as file:
-                self.station_name = file.readline().strip()
-                self.coordinates = file.readline().strip()
-                self.date = file.readline().strip()
+                self.iono.station_name = file.readline().strip()
+                (self.iono.lat, self.iono.long,
+                    self.iono.gyro, self.iono.dip,
+                    self.iono.sunspot) = file.readline().strip().split()
+                self.iono.date = file.readline().strip()
+
+                self.stationNameEdit.setText(self.iono.station_name)
+                self.latLineEdit.setText(self.iono.lat)
+                self.longLineEdit.setText(self.iono.long)
+                self.gyrofrequencyLineEdit.setText(self.iono.gyro)
+                self.dipAngleLineEdit.setText(self.iono.dip)
+                self.sunspotNumberLineEdit.setText(self.iono.sunspot)
+
                 foE = file.readline().strip()
                 if abs(float(foE) - 99.0) > 1:
                     self.lineEditE.setText(foE)
@@ -557,7 +564,9 @@ class MainWindow(QMainWindow):
 
     def save_file(self):
         if self.file_name:
-            # self.save_std(self.file_name + '.STD')
+            if self.stdCheckBox.isChecked():
+                self.save_std(self.file_name + '.STD')
+
             if self.pngCheckBox.isChecked():
                 width = self.pngWidthSpinBox.value()
                 height = self.pngHeightSpinBox.value()
@@ -570,46 +579,74 @@ class MainWindow(QMainWindow):
             self.statusbar.showMessage('File is saved.')
 
     def save_std(self, filename):
-        with open(filename, 'w') as file:
-            foE = self.lineEditE.text().strip()
-            try:
-                foE = float(foE)
-                if abs(foE - 99.0) < 1.0 or abs(foE) < 0.1:
-                    foE = '99.0'
-            except ValueError:
+
+        foE = self.lineEditE.text().strip()
+        try:
+            foE = float(foE)
+            if abs(foE - 99.0) < 1.0 or abs(foE) < 0.1:
                 foE = '99.0'
+        except ValueError:
+            foE = '99.0'
 
-            fohE = ''
-            for i in range(self.listWidgetE.count()):
-                    fohE += self.listWidgetE.item(i).text() + '\n'
+        fohE = ''
+        for i in range(self.listWidgetE.count()):
+                fohE += self.listWidgetE.item(i).text() + '\n'
 
-            foF1 = self.lineEditF1.text().strip()
-            try:
-                foF1 = float(foF1)
-                if abs(foF1 - 99.0) < 1.0 or abs(foF1) < 0.1:
-                    foF1 = '99.0'
-            except ValueError:
+        foF1 = self.lineEditF1.text().strip()
+        try:
+            foF1 = float(foF1)
+            if abs(foF1 - 99.0) < 1.0 or abs(foF1) < 0.1:
                 foF1 = '99.0'
+        except ValueError:
+            foF1 = '99.0'
 
-            fohF1 = ''
-            for i in range(self.listWidgetF1.count()):
-                fohF1 += self.listWidgetF1.item(i).text() + '\n'
+        fohF1 = ''
+        for i in range(self.listWidgetF1.count()):
+            fohF1 += self.listWidgetF1.item(i).text() + '\n'
 
-            foF2 = self.lineEditF2.text().strip()
-            try:
-                foF2 = float(foF2)
-                if abs(foF2 - 99.0) < 1.0 or abs(foF2) < 0.1:
-                    foF2 = '99.0'
-            except ValueError:
+        foF2 = self.lineEditF2.text().strip()
+        try:
+            foF2 = float(foF2)
+            if abs(foF2 - 99.0) < 1.0 or abs(foF2) < 0.1:
                 foF2 = '99.0'
+        except ValueError:
+            foF2 = '99.0'
 
-            fohF2 = ''
-            for i in range(self.listWidgetF2.count()):
-                fohF2 += self.listWidgetF2.item(i).text() + '\n'
+        fohF2 = ''
+        for i in range(self.listWidgetF2.count()):
+            fohF2 += self.listWidgetF2.item(i).text() + '\n'
 
-            file.write(self.station_name + '\n')
-            file.write(self.coordinates + '\n')
-            file.write(self.date + '\n')
+        lat = self.latLineEdit.text().strip()
+        lon = self.longLineEdit.text().strip()
+        gyro = self.gyrofrequencyLineEdit.text().strip()
+        dip = self.dipAngleLineEdit.text().strip()
+        sunspot = self.sunspotNumberLineEdit.text().strip()
+
+        self.iono.lat = lat if len(lat) > 0 else 0
+        self.iono.lon = lon if len(lon) > 0 else 0
+        self.iono.gyro = gyro if len(gyro) > 0 else 0
+        self.iono.dip = dip if len(dip) > 0 else 0
+        self.iono.sunspot = sunspot if len(sunspot) > 0 else 0
+
+        coordinates = str.format(
+            '{} {} {} {} {}',
+            str(self.iono.lat),
+            str(self.iono.lon),
+            str(self.iono.gyro),
+            str(self.iono.dip),
+            str(self.iono.sunspot))
+
+        date = datetime.strptime(self.dateTimeEdit.text(), '%Y-%m-%d %H:%M')
+        timezone = int(self.timeZoneComboBox.currentText().strip())
+        date += timedelta(hours=timezone)
+        date = date.strftime('%Y %m %d %H %M 00')
+
+        with open(filename, 'w') as file:
+            file.write(self.iono.station_name + '\n')
+
+            file.write(coordinates + '\n')
+
+            file.write(date + '\n')
 
             file.write(str(foE) + '\n')
             file.write(str(fohE))
@@ -638,7 +675,7 @@ class MainWindow(QMainWindow):
                 'UTC' if timeZone == '0' else 'UTC'+timeZone)
             plt.title(title)
             plt.tight_layout()
-            self.figure.savefig(filename, dpi=dpi)#, bbox_inches='tight')
+            self.figure.savefig(filename, dpi=dpi)
             plt.title('')
             self.figure.set_size_inches(old_size)
             plt.tight_layout()
