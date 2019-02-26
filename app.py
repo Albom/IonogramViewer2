@@ -511,11 +511,12 @@ class MainWindow(QMainWindow):
     def load_text_info(self):
         try:
             with open(self.file_name + '.STD', 'r') as file:
-                self.iono.station_name = file.readline().strip()
+                (self.iono.station_name,
+                    timezone) = file.readline().strip().split('//')
                 (self.iono.lat, self.iono.long,
                     self.iono.gyro, self.iono.dip,
                     self.iono.sunspot) = file.readline().strip().split()
-                self.iono.date = file.readline().strip()
+                date = file.readline().strip()
 
                 self.stationNameEdit.setText(self.iono.station_name)
                 self.latLineEdit.setText(self.iono.lat)
@@ -523,6 +524,16 @@ class MainWindow(QMainWindow):
                 self.gyrofrequencyLineEdit.setText(self.iono.gyro)
                 self.dipAngleLineEdit.setText(self.iono.dip)
                 self.sunspotNumberLineEdit.setText(self.iono.sunspot)
+
+                self.iono.set_timezone(timezone)
+                timezone = self.iono.get_timezone()
+                position = self.timeZoneComboBox.findText(str.format('{:>+3d}' if timezone != 0 else '{:>3d}', timezone))
+                self.timeZoneComboBox.setCurrentIndex(position)
+
+                date = datetime.strptime(date, '%Y %m %d %H %M 00')
+                date += timedelta(hours=timezone) # Convert from UT
+                self.iono.set_date(date)
+                self.dateTimeEdit.setDateTime(self.iono.get_date())
 
                 foE = file.readline().strip()
                 if abs(float(foE) - 99.0) > 1:
@@ -638,11 +649,13 @@ class MainWindow(QMainWindow):
 
         date = datetime.strptime(self.dateTimeEdit.text(), '%Y-%m-%d %H:%M')
         timezone = int(self.timeZoneComboBox.currentText().strip())
-        date += timedelta(hours=timezone)
+        date -= timedelta(hours=timezone) # Convert to UT
         date = date.strftime('%Y %m %d %H %M 00')
 
+        station = self.iono.station_name  + '//' + str(timezone)
+
         with open(filename, 'w') as file:
-            file.write(self.iono.station_name + '\n')
+            file.write(station + '\n')
 
             file.write(coordinates + '\n')
 

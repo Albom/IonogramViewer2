@@ -28,5 +28,11 @@ class Iono:
     def get_date(self):
         return self.date
 
+    def set_date(self, date):
+        self.date = date
+
     def get_timezone(self):
         return self.timezone
+
+    def set_timezone(self, timezone):
+        self.timezone = int(timezone)
