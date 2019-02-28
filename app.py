@@ -67,11 +67,11 @@ class MainWindow(QMainWindow):
             w.setContextMenuPolicy(Qt.CustomContextMenu)
             w.customContextMenuRequested.connect(self.delete_menu)
 
-        lineEdits = [
-            self.lineEditE, self.lineEditF1, self.lineEditF2,
-            self.lineEditEm, self.lineEditF1m, self.lineEditF2m]
-        for e in lineEdits:
-            e.textChanged.connect(self.plot_lines)
+        spinBoxes = [
+            self.doubleSpinBoxF2, self.doubleSpinBoxF1, self.doubleSpinBoxE,
+            self.doubleSpinBoxF2m, self.doubleSpinBoxF1m, self.doubleSpinBoxEm]
+        for w in spinBoxes:
+            w.valueChanged.connect(self.plot_lines)
 
         self.timeZoneComboBox.addItems([str.format('{:>+3d}' if i != 0 else '{:>3d}', i) for i in range(-11, 13)])
         font = QFont("Monospace");
@@ -129,6 +129,7 @@ class MainWindow(QMainWindow):
 
         self.change_mode(0)
 
+        '''
         self.lineEditE.setText('')
         self.lineEditF1.setText('')
         self.lineEditF2.setText('')
@@ -136,6 +137,7 @@ class MainWindow(QMainWindow):
         self.lineEditEm.setText('')
         self.lineEditF1m.setText('')
         self.lineEditF2m.setText('')
+        '''
 
         self.listWidgetE.clear()
         self.listWidgetF1.clear()
@@ -162,31 +164,31 @@ class MainWindow(QMainWindow):
         self.mode = mode
 
         widgets = [
-            self.lineEditE, self.lineEditEm, self.listWidgetE,
-            self.lineEditF1, self.lineEditF1m, self.listWidgetF1,
-            self.lineEditF2, self.lineEditF2m, self.listWidgetF2]
+            self.doubleSpinBoxE, self.doubleSpinBoxF1, self.doubleSpinBoxF2,
+            self.doubleSpinBoxEm, self.doubleSpinBoxF1m, self.doubleSpinBoxF2m,
+            self.listWidgetE, self.listWidgetF1, self.listWidgetF2]
         for w in widgets:
             w.setEnabled(False)
 
         if mode == 0:
-            self.lineEditF2.setEnabled(True)
-            self.lineEditF2m.setEnabled(True)
+            self.doubleSpinBoxF2.setEnabled(True)
+            self.doubleSpinBoxF2m.setEnabled(True)
             self.listWidgetF2.setEnabled(True)
         elif mode == 1:
-            self.lineEditF1.setEnabled(True)
-            self.lineEditF1m.setEnabled(True)
+            self.doubleSpinBoxF1.setEnabled(True)
+            self.doubleSpinBoxF1m.setEnabled(True)
             self.listWidgetF1.setEnabled(True)
         elif mode == 2:
-            self.lineEditE.setEnabled(True)
-            self.lineEditEm.setEnabled(True)
+            self.doubleSpinBoxE.setEnabled(True)
+            self.doubleSpinBoxEm.setEnabled(True)
             self.listWidgetE.setEnabled(True)
 
     def onclick(self, event):
         if event.ydata and event.xdata:
-            f = self.iono.coord_to_freq(event.xdata)
+            f = round(self.iono.coord_to_freq(event.xdata), 2)
             h = event.ydata
             s = '{:5.2f} {:5.1f}'.format(f, h)
-            f = '{:<5.2f}'.format(f).strip()
+            #f = '{:<5.2f}'.format(f).strip()
             if event.button == 1:
                 if self.mode == 0:  # F2
                     self.listWidgetF2.addItem(s)
@@ -196,18 +198,18 @@ class MainWindow(QMainWindow):
                     self.listWidgetE.addItem(s)
             elif event.button == 3:
                 if self.mode == 0:  # F2
-                    self.lineEditF2.setText(f)
+                    self.doubleSpinBoxF2.setValue(f)
                 elif self.mode == 1:  # F1
-                    self.lineEditF1.setText(f)
+                    self.doubleSpinBoxF1.setValue(f)
                 elif self.mode == 2:  # E
-                    self.lineEditE.setText(f)
+                    self.doubleSpinBoxE.setValue(f)
             elif event.button == 2:
                 if self.mode == 0:  # F2
-                    self.lineEditF2m.setText(f)
+                    self.doubleSpinBoxF2m.setValue(f)
                 elif self.mode == 1:  # F1
-                    self.lineEditF1m.setText(f)
+                    self.doubleSpinBoxF1m.setValue(f)
                 elif self.mode == 2:  # E
-                    self.lineEditEm.setText(f)
+                    self.doubleSpinBoxEm.setValue(f)
             self.plot_scatter()
 
     def plot_scatter(self):
@@ -256,12 +258,13 @@ class MainWindow(QMainWindow):
         top = self.iono.get_extent()[3]
         bottom = self.iono.get_extent()[2]
 
-        foE = self.lineEditE.text().strip()
-
+        foE = self.doubleSpinBoxE.value()
+        '''
         try:
             foE = float(foE)
         except ValueError:
             foE = 99.0
+        '''
 
         if (foE > left) and (foE < right):
             if self.e_critical is not None:
@@ -276,12 +279,14 @@ class MainWindow(QMainWindow):
                 self.e_critical.remove()
                 self.e_critical = None
 
-        foF1 = self.lineEditF1.text().strip()
+        foF1 = self.doubleSpinBoxF1.value()
 
+        '''
         try:
             foF1 = float(foF1)
         except ValueError:
             foF1 = 99.0
+        '''
 
         if (foF1 > left) and (foF1 < right):
             if self.f1_critical is not None:
@@ -295,12 +300,14 @@ class MainWindow(QMainWindow):
                 self.f1_critical.remove()
                 self.f1_critical = None
 
-        foF2 = self.lineEditF2.text().strip()
+        foF2 = self.doubleSpinBoxF2.value()
 
+        '''
         try:
             foF2 = float(foF2)
         except ValueError:
             foF2 = 99.0
+        '''
 
         if (foF2 > left) and (foF2 < right):
             if self.f2_critical is not None:
@@ -314,11 +321,13 @@ class MainWindow(QMainWindow):
                 self.f2_critical.remove()
                 self.f2_critical = None
 
-        f_min_F2 = self.lineEditF2m.text().strip()
+        f_min_F2 = self.doubleSpinBoxF2m.value()
+        '''
         try:
             f_min_F2 = float(f_min_F2)
         except ValueError:
             f_min_F2 = 99.0
+        '''
 
         if (f_min_F2 > left) and (f_min_F2 < right):
             if self.f2_min is not None:
@@ -336,11 +345,13 @@ class MainWindow(QMainWindow):
                 self.f2_min.remove()
                 self.f2_min = None
 
-        f_min_F1 = self.lineEditF1m.text().strip()
+        f_min_F1 = self.doubleSpinBoxF1m.value()#self.lineEditF1m.text().strip()
+        '''
         try:
             f_min_F1 = float(f_min_F1)
         except ValueError:
             f_min_F1 = 99.0
+        '''
 
         if (f_min_F1 > left) and (f_min_F1 < right):
             if self.f1_min is not None:
@@ -358,11 +369,13 @@ class MainWindow(QMainWindow):
                 self.f1_min.remove()
                 self.f1_min = None
 
-        f_min_E = self.lineEditEm.text().strip()
+        f_min_E = self.doubleSpinBoxEm.value() #self.lineEditEm.text().strip()
+        '''
         try:
             f_min_E = float(f_min_E)
         except ValueError:
             f_min_E = 99.0
+        '''
 
         if (f_min_E > left) and (f_min_E < right):
             if self.e_min is not None:
@@ -535,9 +548,9 @@ class MainWindow(QMainWindow):
                 self.iono.set_date(date)
                 self.dateTimeEdit.setDateTime(self.iono.get_date())
 
-                foE = file.readline().strip()
-                if abs(float(foE) - 99.0) > 1:
-                    self.lineEditE.setText(foE)
+                foE = float(file.readline().strip())
+                if abs(foE - 99.0) > 1:
+                    self.doubleSpinBoxE.setValue(foE)
                 while True:
                     line = file.readline().strip()
                     if line == 'END':
@@ -546,9 +559,9 @@ class MainWindow(QMainWindow):
                     line = '{:-5.2f} {:-5.1f}'.format(float(s[0]), float(s[1]))
                     self.listWidgetE.addItem(line)
 
-                foF1 = file.readline().strip()
-                if abs(float(foF1) - 99.0) > 1:
-                    self.lineEditF1.setText(foF1)
+                foF1 = float(file.readline().strip())
+                if abs(foF1 - 99.0) > 1:
+                    self.doubleSpinBoxF1.setValue(foF1)
                 while True:
                     line = file.readline().strip()
                     if line == 'END':
@@ -557,9 +570,9 @@ class MainWindow(QMainWindow):
                     line = '{:-5.2f} {:-5.1f}'.format(float(s[0]), float(s[1]))
                     self.listWidgetF1.addItem(line)
 
-                foF2 = file.readline().strip()
-                if abs(float(foF2) - 99.0) > 1:
-                    self.lineEditF2.setText(foF2)
+                foF2 = float(file.readline().strip())
+                if abs(foF2 - 99.0) > 1:
+                    self.doubleSpinBoxF2.setValue(foF2)
                 while True:
                     line = file.readline().strip()
                     if line == 'END':
@@ -591,36 +604,24 @@ class MainWindow(QMainWindow):
 
     def save_std(self, filename):
 
-        foE = self.lineEditE.text().strip()
-        try:
-            foE = float(foE)
-            if abs(foE - 99.0) < 1.0 or abs(foE) < 0.1:
-                foE = '99.0'
-        except ValueError:
+        foE = self.doubleSpinBoxE.value()
+        if abs(foE - 99.0) < 1.0 or abs(foE) < 0.1:
             foE = '99.0'
 
         fohE = ''
         for i in range(self.listWidgetE.count()):
                 fohE += self.listWidgetE.item(i).text() + '\n'
 
-        foF1 = self.lineEditF1.text().strip()
-        try:
-            foF1 = float(foF1)
-            if abs(foF1 - 99.0) < 1.0 or abs(foF1) < 0.1:
-                foF1 = '99.0'
-        except ValueError:
+        foF1 = self.doubleSpinBoxF1.value()
+        if abs(foF1 - 99.0) < 1.0 or abs(foF1) < 0.1:
             foF1 = '99.0'
 
         fohF1 = ''
         for i in range(self.listWidgetF1.count()):
             fohF1 += self.listWidgetF1.item(i).text() + '\n'
 
-        foF2 = self.lineEditF2.text().strip()
-        try:
-            foF2 = float(foF2)
-            if abs(foF2 - 99.0) < 1.0 or abs(foF2) < 0.1:
-                foF2 = '99.0'
-        except ValueError:
+        foF2 = self.doubleSpinBoxF2.value()
+        if abs(foF2 - 99.0) < 1.0 or abs(foF2) < 0.1:
             foF2 = '99.0'
 
         fohF2 = ''

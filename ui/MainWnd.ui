@@ -147,24 +147,16 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditF2">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string notr="true">The critical frequency of the layer F2
-(Right-click)</string>
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxF2">
+       <property name="singleStep">
+        <double>0.010000000000000</double>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditF2m">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string notr="true">The minimal frequency of the layer F2
-(Middle-click)</string>
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxF2m">
+       <property name="singleStep">
+        <double>0.010000000000000</double>
        </property>
       </widget>
      </item>
@@ -193,27 +185,22 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditF1">
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxF1">
        <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="toolTip">
-        <string notr="true">The critical frequency of the layer F1
-(Right-click)</string>
-       </property>
-       <property name="clearButtonEnabled">
-        <bool>false</bool>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditF1m">
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxF1m">
        <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="toolTip">
-        <string notr="true">The minimal frequency of the layer F1
-(Middle-click)</string>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
        </property>
       </widget>
      </item>
@@ -245,36 +232,22 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditE">
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxE">
        <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="toolTip">
-        <string notr="true">The critical frequency of the layer E
-(Right-click)</string>
-       </property>
-       <property name="inputMethodHints">
-        <set>Qt::ImhNone</set>
-       </property>
-       <property name="inputMask">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="placeholderText">
-        <string notr="true"/>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditEm">
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxEm">
        <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="toolTip">
-        <string notr="true">The minimal frequency of the layer E
-(Middle-click)</string>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
        </property>
       </widget>
      </item>
