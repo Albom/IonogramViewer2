@@ -73,14 +73,16 @@ class MainWindow(QMainWindow):
         for w in spinBoxes:
             w.valueChanged.connect(self.plot_lines)
 
-        self.timeZoneComboBox.addItems([str.format('{:>+3d}' if i != 0 else '{:>3d}', i) for i in range(-11, 13)])
-        font = QFont("Monospace");
-        font.setStyleHint(QFont.TypeWriter);
+        items = [str.format('{:>+3d}' if i != 0 else '{:>3d}', i) for i in range(-11, 13)]
+        self.timeZoneComboBox.addItems(items)
+        font = QFont("Monospace")
+        font.setStyleHint(QFont.TypeWriter)
         self.timeZoneComboBox.setFont(font)
 
-        self.properties_of_iono = [self.stationNameEdit,
-            self.timeZoneComboBox, self.ursiCodeEdit, self.dateTimeEdit,
-            self.latLineEdit, self.longLineEdit, self.sunspotNumberLineEdit,
+        self.properties_of_iono = [
+            self.stationNameEdit, self.timeZoneComboBox,
+            self.ursiCodeEdit, self.dateTimeEdit, self.latLineEdit,
+            self.longLineEdit, self.sunspotNumberLineEdit,
             self.gyrofrequencyLineEdit, self.dipAngleLineEdit]
 
         self.dateTimeEdit.setDisplayFormat(DATE_TIME_FORMAT)
@@ -92,7 +94,8 @@ class MainWindow(QMainWindow):
 
     def png_state_changed(self, state):
         s = state == Qt.Checked
-        elements = [self.pngDefaultButton, self.pngWidthSpinBox,
+        elements = [
+            self.pngDefaultButton, self.pngWidthSpinBox,
             self.pngHeightSpinBox, self.pngDpiSpinBox]
         for e in elements:
             e.setEnabled(s)
@@ -129,15 +132,12 @@ class MainWindow(QMainWindow):
 
         self.change_mode(0)
 
-        '''
-        self.lineEditE.setText('')
-        self.lineEditF1.setText('')
-        self.lineEditF2.setText('')
-
-        self.lineEditEm.setText('')
-        self.lineEditF1m.setText('')
-        self.lineEditF2m.setText('')
-        '''
+        self.doubleSpinBoxF2.setValue(0)
+        self.doubleSpinBoxF1.setValue(0)
+        self.doubleSpinBoxE.setValue(0)
+        self.doubleSpinBoxF2m.setValue(0)
+        self.doubleSpinBoxF1m.setValue(0)
+        self.doubleSpinBoxEm.setValue(0)
 
         self.listWidgetE.clear()
         self.listWidgetF1.clear()
@@ -188,7 +188,6 @@ class MainWindow(QMainWindow):
             f = round(self.iono.coord_to_freq(event.xdata), 2)
             h = event.ydata
             s = '{:5.2f} {:5.1f}'.format(f, h)
-            #f = '{:<5.2f}'.format(f).strip()
             if event.button == 1:
                 if self.mode == 0:  # F2
                     self.listWidgetF2.addItem(s)
@@ -258,140 +257,47 @@ class MainWindow(QMainWindow):
         top = self.iono.get_extent()[3]
         bottom = self.iono.get_extent()[2]
 
-        foE = self.doubleSpinBoxE.value()
-        '''
-        try:
-            foE = float(foE)
-        except ValueError:
-            foE = 99.0
-        '''
+        def plot_line(box, line, color, style='-'):
+            if line is not None:
+                line.remove()
+                line = None
+            freq = box.value()
+            if (freq > left) and (freq < right):
+                f = self.iono.freq_to_coord(freq)
+                line, = self.ax.plot(
+                    [f, f],
+                    [bottom, top],
+                    c=color,
+                    linestyle=style)
+            return line
 
-        if (foE > left) and (foE < right):
-            if self.e_critical is not None:
-                self.e_critical.remove()
-                self.e_critical = None
-
-            f = self.iono.freq_to_coord(foE)
-
-            self.e_critical, = self.ax.plot([f, f], [bottom, top], c='g')
-        else:
-            if self.e_critical is not None:
-                self.e_critical.remove()
-                self.e_critical = None
-
-        foF1 = self.doubleSpinBoxF1.value()
-
-        '''
-        try:
-            foF1 = float(foF1)
-        except ValueError:
-            foF1 = 99.0
-        '''
-
-        if (foF1 > left) and (foF1 < right):
-            if self.f1_critical is not None:
-                self.f1_critical.remove()
-                self.f1_critical = None
-
-            f = self.iono.freq_to_coord(foF1)
-            self.f1_critical, = self.ax.plot([f, f], [bottom, top], c='c')
-        else:
-            if self.f1_critical is not None:
-                self.f1_critical.remove()
-                self.f1_critical = None
-
-        foF2 = self.doubleSpinBoxF2.value()
-
-        '''
-        try:
-            foF2 = float(foF2)
-        except ValueError:
-            foF2 = 99.0
-        '''
-
-        if (foF2 > left) and (foF2 < right):
-            if self.f2_critical is not None:
-                self.f2_critical.remove()
-                self.f2_critical = None
-
-            f = self.iono.freq_to_coord(foF2)
-            self.f2_critical, = self.ax.plot([f, f], [bottom, top], c='r')
-        else:
-            if self.f2_critical is not None:
-                self.f2_critical.remove()
-                self.f2_critical = None
-
-        f_min_F2 = self.doubleSpinBoxF2m.value()
-        '''
-        try:
-            f_min_F2 = float(f_min_F2)
-        except ValueError:
-            f_min_F2 = 99.0
-        '''
-
-        if (f_min_F2 > left) and (f_min_F2 < right):
-            if self.f2_min is not None:
-                self.f2_min.remove()
-                self.f2_min = None
-
-            f = self.iono.freq_to_coord(f_min_F2)
-            self.f2_min, = self.ax.plot(
-                [f, f],
-                [bottom, top],
-                c='r',
-                linestyle='--')
-        else:
-            if self.f2_min is not None:
-                self.f2_min.remove()
-                self.f2_min = None
-
-        f_min_F1 = self.doubleSpinBoxF1m.value()#self.lineEditF1m.text().strip()
-        '''
-        try:
-            f_min_F1 = float(f_min_F1)
-        except ValueError:
-            f_min_F1 = 99.0
-        '''
-
-        if (f_min_F1 > left) and (f_min_F1 < right):
-            if self.f1_min is not None:
-                self.f1_min.remove()
-                self.f1_min = None
-
-            f = self.iono.freq_to_coord(f_min_F1)
-            self.f1_min, = self.ax.plot(
-                [f, f],
-                [bottom, top],
-                c='c',
-                linestyle='--')
-        else:
-            if self.f1_min is not None:
-                self.f1_min.remove()
-                self.f1_min = None
-
-        f_min_E = self.doubleSpinBoxEm.value() #self.lineEditEm.text().strip()
-        '''
-        try:
-            f_min_E = float(f_min_E)
-        except ValueError:
-            f_min_E = 99.0
-        '''
-
-        if (f_min_E > left) and (f_min_E < right):
-            if self.e_min is not None:
-                self.e_min.remove()
-                self.e_min = None
-
-            f = self.iono.freq_to_coord(f_min_E)
-            self.e_min, = self.ax.plot(
-                [f, f],
-                [bottom, top],
-                c='g',
-                linestyle='--')
-        else:
-            if self.e_min is not None:
-                self.e_min.remove()
-                self.e_min = None
+        self.f2_critical = plot_line(
+            self.doubleSpinBoxF2,
+            self.f2_critical,
+            'r')
+        self.f1_critical = plot_line(
+            self.doubleSpinBoxF1,
+            self.f1_critical,
+            'c')
+        self.e_critical = plot_line(
+            self.doubleSpinBoxE,
+            self.e_critical,
+            'g')
+        self.f2_min = plot_line(
+            self.doubleSpinBoxF2m,
+            self.f2_min,
+            'r',
+            style='--')
+        self.f1_min = plot_line(
+            self.doubleSpinBoxF1m,
+            self.f1_min,
+            'c',
+            style='--')
+        self.e_min = plot_line(
+            self.doubleSpinBoxEm,
+            self.e_min,
+            'g',
+            style='--')
 
         self.canvas.draw()
 
@@ -544,7 +450,7 @@ class MainWindow(QMainWindow):
                 self.timeZoneComboBox.setCurrentIndex(position)
 
                 date = datetime.strptime(date, '%Y %m %d %H %M 00')
-                date += timedelta(hours=timezone) # Convert from UT
+                date += timedelta(hours=timezone)  # Convert from UT
                 self.iono.set_date(date)
                 self.dateTimeEdit.setDateTime(self.iono.get_date())
 
@@ -650,10 +556,10 @@ class MainWindow(QMainWindow):
 
         date = datetime.strptime(self.dateTimeEdit.text(), '%Y-%m-%d %H:%M')
         timezone = int(self.timeZoneComboBox.currentText().strip())
-        date -= timedelta(hours=timezone) # Convert to UT
+        date -= timedelta(hours=timezone)  # Convert to UT
         date = date.strftime('%Y %m %d %H %M 00')
 
-        station = self.iono.station_name  + '//' + str(timezone)
+        station = self.iono.station_name + '//' + str(timezone)
 
         with open(filename, 'w') as file:
             file.write(station + '\n')
