@@ -1,5 +1,5 @@
 import sys
-from os import walk, path
+from os import path
 from datetime import datetime, timedelta
 from PyQt5 import uic
 from PyQt5.QtGui import QFont
@@ -19,6 +19,7 @@ from karazin_iono import KarazinIono
 from ips42_iono import Ips42Iono
 from dps_amp_iono import DpsAmpIono
 
+from filelist import FileList
 
 DATE_TIME_FORMAT = 'yyyy-MM-dd hh:mm'
 
@@ -412,20 +413,14 @@ class MainWindow(QMainWindow):
         if self.file_name:
             self.open_file(self.file_name)
 
-    def get_filelist(self, directory):
-        filenames = []
-        for (dp, dn, fn) in walk(directory):
-            filenames.extend(fn)
-            break
 
-        filenames.sort()
+    def get_filelist(self, directory):
         tester = IonoTester()
         result = []
-        for filename in filenames:
+        for filename in FileList.get(directory):
             class_name = tester.examine(directory+'/'+filename)['class_name']
             if class_name != 'Unknown':
                 result.append(filename)
-
         return result
 
     def load_text_info(self):
