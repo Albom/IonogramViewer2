@@ -26,9 +26,22 @@ DATE_TIME_FORMAT = 'yyyy-MM-dd hh:mm'
 class MainWindow(QMainWindow):
 
     def __init__(self):
+
         super().__init__()
 
         self.program_name = 'IonogramViewer2 v1.3 pre'
+        self.file_name = ''
+        self.iono = None
+        self.ax = None
+        self.f2_scatter = None
+        self.f1_scatter = None
+        self.e_scatter = None
+        self.f2_critical = None
+        self.f1_critical = None
+        self.e_critical = None
+        self.f2_min = None
+        self.f1_min = None
+        self.e_min = None
 
         uic.loadUi('./ui/MainWnd.ui', self)
 
@@ -73,7 +86,8 @@ class MainWindow(QMainWindow):
         for w in spinBoxes:
             w.valueChanged.connect(self.plot_lines)
 
-        items = [str.format('{:>+3d}' if i != 0 else '{:>3d}', i) for i in range(-11, 13)]
+        items = [str.format('{:>+3d}' if i != 0 else '{:>3d}', i)
+                 for i in range(-11, 13)]
         self.timeZoneComboBox.addItems(items)
         font = QFont("Monospace")
         font.setStyleHint(QFont.TypeWriter)
@@ -144,7 +158,7 @@ class MainWindow(QMainWindow):
         self.listWidgetF2.clear()
 
         self.radioButtonF2.setChecked(True)
-        [e.setEnabled(False) for e in self.properties_of_iono]
+        _ = [e.setEnabled(False) for e in self.properties_of_iono]
 
     def delete_menu(self, point):
         if self.sender().count():
@@ -158,7 +172,7 @@ class MainWindow(QMainWindow):
                 self.sender().takeItem(item)
             elif r is delete_all_action:
                 self.sender().clear()
-            self.plot_scatter()
+            self.plot_scatters()
 
     def change_mode(self, mode):
         self.mode = mode
@@ -209,9 +223,9 @@ class MainWindow(QMainWindow):
                     self.doubleSpinBoxF1m.setValue(f)
                 elif self.mode == 2:  # E
                     self.doubleSpinBoxEm.setValue(f)
-            self.plot_scatter()
+            self.plot_scatters()
 
-    def plot_scatter(self):
+    def plot_scatters(self):
         if self.e_scatter is not None:
             self.e_scatter.remove()
 
@@ -272,32 +286,17 @@ class MainWindow(QMainWindow):
             return line
 
         self.f2_critical = plot_line(
-            self.doubleSpinBoxF2,
-            self.f2_critical,
-            'r')
+            self.doubleSpinBoxF2, self.f2_critical, 'r')
         self.f1_critical = plot_line(
-            self.doubleSpinBoxF1,
-            self.f1_critical,
-            'c')
+            self.doubleSpinBoxF1, self.f1_critical, 'c')
         self.e_critical = plot_line(
-            self.doubleSpinBoxE,
-            self.e_critical,
-            'g')
+            self.doubleSpinBoxE, self.e_critical, 'g')
         self.f2_min = plot_line(
-            self.doubleSpinBoxF2m,
-            self.f2_min,
-            'r',
-            style='--')
+            self.doubleSpinBoxF2m, self.f2_min, 'r', style='--')
         self.f1_min = plot_line(
-            self.doubleSpinBoxF1m,
-            self.f1_min,
-            'c',
-            style='--')
+            self.doubleSpinBoxF1m, self.f1_min, 'c', style='--')
         self.e_min = plot_line(
-            self.doubleSpinBoxEm,
-            self.e_min,
-            'g',
-            style='--')
+            self.doubleSpinBoxEm, self.e_min, 'g', style='--')
 
         self.canvas.draw()
 
@@ -363,13 +362,15 @@ class MainWindow(QMainWindow):
                     self.canvas.draw()
 
                     self.stationNameEdit.setText(self.iono.get_station_name())
-                    self.ursiCodeEdit.setText(self.iono.get_ursi_code() if 'ursi_code' in vars(self.iono) else '')
+                    self.ursiCodeEdit.setText(
+                        self.iono.get_ursi_code() if 'ursi_code' in vars(self.iono) else '')
                     self.dateTimeEdit.setDateTime(self.iono.get_date())
 
-                    timeZone = self.iono.get_timezone()
-                    position = self.timeZoneComboBox.findText(str.format('{:>+3d}' if timeZone != 0 else '{:>3d}', timeZone))
+                    time_zone = self.iono.get_timezone()
+                    position = self.timeZoneComboBox.findText(
+                        str.format('{:>+3d}' if time_zone != 0 else '{:>3d}', time_zone))
                     self.timeZoneComboBox.setCurrentIndex(position)
-                    [e.setEnabled(True) for e in self.properties_of_iono]
+                    _ = [e.setEnabled(True) for e in self.properties_of_iono]
 
                     self.load_text_info()
             else:
@@ -431,10 +432,10 @@ class MainWindow(QMainWindow):
         try:
             with open(self.file_name + '.STD', 'r') as file:
                 (self.iono.station_name,
-                    timezone) = file.readline().strip().split('//')
+                 timezone) = file.readline().strip().split('//')
                 (self.iono.lat, self.iono.long,
-                    self.iono.gyro, self.iono.dip,
-                    self.iono.sunspot) = file.readline().strip().split()
+                 self.iono.gyro, self.iono.dip,
+                 self.iono.sunspot) = file.readline().strip().split()
                 date = file.readline().strip()
 
                 self.stationNameEdit.setText(self.iono.station_name)
@@ -446,7 +447,8 @@ class MainWindow(QMainWindow):
 
                 self.iono.set_timezone(timezone)
                 timezone = self.iono.get_timezone()
-                position = self.timeZoneComboBox.findText(str.format('{:>+3d}' if timezone != 0 else '{:>3d}', timezone))
+                position = self.timeZoneComboBox.findText(
+                    str.format('{:>+3d}' if timezone != 0 else '{:>3d}', timezone))
                 self.timeZoneComboBox.setCurrentIndex(position)
 
                 date = datetime.strptime(date, '%Y %m %d %H %M 00')
@@ -487,7 +489,7 @@ class MainWindow(QMainWindow):
                     line = '{:-5.2f} {:-5.1f}'.format(float(s[0]), float(s[1]))
                     self.listWidgetF2.addItem(line)
 
-            self.plot_scatter()
+            self.plot_scatters()
 
         except IOError:
             return
@@ -534,17 +536,19 @@ class MainWindow(QMainWindow):
         for i in range(self.listWidgetF2.count()):
             fohF2 += self.listWidgetF2.item(i).text() + '\n'
 
-        lat = self.latLineEdit.text().strip()
-        lon = self.longLineEdit.text().strip()
-        gyro = self.gyrofrequencyLineEdit.text().strip()
-        dip = self.dipAngleLineEdit.text().strip()
-        sunspot = self.sunspotNumberLineEdit.text().strip()
+        def get_value(widget):
+            value = 0
+            try:
+                value = float(widget.text().strip())
+            except ValueError:
+                pass
+            return value
 
-        self.iono.lat = lat if len(lat) > 0 else 0
-        self.iono.lon = lon if len(lon) > 0 else 0
-        self.iono.gyro = gyro if len(gyro) > 0 else 0
-        self.iono.dip = dip if len(dip) > 0 else 0
-        self.iono.sunspot = sunspot if len(sunspot) > 0 else 0
+        self.iono.lat = get_value(self.latLineEdit)
+        self.iono.lon = get_value(self.longLineEdit)
+        self.iono.gyro = get_value(self.gyrofrequencyLineEdit)
+        self.iono.dip = get_value(self.dipAngleLineEdit)
+        self.iono.sunspot = get_value(self.sunspotNumberLineEdit)
 
         coordinates = str.format(
             '{} {} {} {} {}',
@@ -586,13 +590,13 @@ class MainWindow(QMainWindow):
             dpi = 100 if 'dpi' not in kwargs else kwargs['dpi']
             old_size = self.figure.get_size_inches()
             self.figure.set_size_inches(width, height)
-            ursiCode = self.ursiCodeEdit.text().strip()
-            timeZone = self.timeZoneComboBox.currentText().strip()
+            ursi_code = self.ursiCodeEdit.text().strip()
+            time_zone = self.timeZoneComboBox.currentText().strip()
             title = '{}{}, {} ({})'.format(
                 self.stationNameEdit.text().strip(),
-                ' (' + ursiCode + ')' if len(ursiCode) > 0 else '',
+                ' (' + ursi_code + ')' if ursi_code else '',
                 self.dateTimeEdit.dateTime().toString(DATE_TIME_FORMAT),
-                'UTC' if timeZone == '0' else 'UTC'+timeZone)
+                'UTC' if time_zone == '0' else 'UTC'+time_zone)
             plt.title(title)
             plt.tight_layout()
             self.figure.savefig(filename, dpi=dpi)
@@ -610,7 +614,11 @@ class MainWindow(QMainWindow):
         msg.exec_()
 
     def show_about(self):
-        about = '\n\n© 2018-2019 Oleksandr Bogomaz\no.v.bogomaz1985@gmail.com'
+        about = (
+            '\n\n'
+            '© 2018-2019 Oleksandr Bogomaz'
+            '\n'
+            'o.v.bogomaz1985@gmail.com')
 
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
