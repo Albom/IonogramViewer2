@@ -487,8 +487,14 @@
           </item>
           <item row="1" column="0" colspan="2">
            <widget class="QCheckBox" name="sao4CheckBox">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>SAO version 4.3</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
             </property>
            </widget>
           </item>

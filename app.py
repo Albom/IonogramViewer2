@@ -20,6 +20,9 @@ from ips42_iono import Ips42Iono
 from dps_amp_iono import DpsAmpIono
 
 from filelist import FileList
+from sao import Sao, \
+    PrefaceAA, PrefaceFE, \
+    GeophysicalConstants as GC, ScaledCharacteristics as SC
 
 DATE_TIME_FORMAT = 'yyyy-MM-dd hh:mm'
 
@@ -413,7 +416,6 @@ class MainWindow(QMainWindow):
         if self.file_name:
             self.open_file(self.file_name)
 
-
     def get_filelist(self, directory):
         tester = IonoTester()
         result = []
@@ -443,7 +445,8 @@ class MainWindow(QMainWindow):
                 self.iono.set_timezone(timezone)
                 timezone = self.iono.get_timezone()
                 position = self.timeZoneComboBox.findText(
-                    str.format('{:>+3d}' if timezone != 0 else '{:>3d}', timezone))
+                    str.format('{:>+3d}' if timezone != 0 else '{:>3d}',
+                               timezone))
                 self.timeZoneComboBox.setCurrentIndex(position)
 
                 date = datetime.strptime(date, '%Y %m %d %H %M 00')
@@ -491,6 +494,10 @@ class MainWindow(QMainWindow):
 
     def save_file(self):
         if self.file_name:
+
+            if self.sao4CheckBox.isChecked():
+                self.save_sao4(self.file_name + '.sao')
+
             if self.stdCheckBox.isChecked():
                 self.save_std(self.file_name + '.STD')
 
@@ -504,6 +511,80 @@ class MainWindow(QMainWindow):
                     height=height,
                     dpi=dpi)
             self.statusbar.showMessage('File is saved.')
+
+    def save_sao4(self, filename):
+        sao = Sao()
+
+        sao.data_file_index[-1] = 5  # SAO-4.3
+
+        sao.data_file_index[0] = 5
+        sao.geophysical_constants = [0.0]*sao.data_file_index[0]
+        sao.geophysical_constants[GC.GYROFREQUENCY] = float(
+            self.gyrofrequencyLineEdit.text().strip())
+        sao.geophysical_constants[GC.DIP_ANGLE] = float(
+            self.dipAngleLineEdit.text().strip())
+        sao.geophysical_constants[GC.GEOGRAPHIC_LATITUDE] = float(
+            self.latLineEdit.text().strip())
+        sao.geophysical_constants[GC.GEOGRAPHIC_LONGITUDE] = float(
+            self.longLineEdit.text().strip())
+        sao.geophysical_constants[GC.SUNSPOT_NUMBER] = float(
+            self.sunspotNumberLineEdit.text().strip())
+
+        sao.data_file_index[1] = 1
+        sao.system_description = ', '.join([
+            self.get_description(),
+            self.program_name])
+
+        sao.timestamp_and_settings = PrefaceAA(  # should be PrefaceFE(
+            datetime.strptime(self.dateTimeEdit.text(), '%Y-%m-%d %H:%M'))
+        sao.data_file_index[2] = len(str(sao.timestamp_and_settings))
+
+        NO_VAL = 9999.000
+
+        def check_ranges(val):
+            left = self.iono.get_extent()[0]
+            right = self.iono.get_extent()[1]
+            if val > left and val < right:
+                return val
+            else:
+                return NO_VAL
+
+        sao.data_file_index[3] = 49
+        sao.scaled_characteristics = [NO_VAL]*sao.data_file_index[3]
+        sao.scaled_characteristics[SC.FoF2] = check_ranges(
+            self.doubleSpinBoxF2.value())
+        sao.scaled_characteristics[SC.FoF1] = check_ranges(
+            self.doubleSpinBoxF1.value())
+        sao.scaled_characteristics[SC.FoE] = check_ranges(
+            self.doubleSpinBoxE.value())
+
+        sao.scaled_characteristics[SC.F_MIN_F] = min((
+            check_ranges(self.doubleSpinBoxF2m.value()),
+            check_ranges(self.doubleSpinBoxF1m.value()),))
+
+        sao.scaled_characteristics[SC.F_MIN_E] = check_ranges(
+            self.doubleSpinBoxEm.value()) 
+
+        sao.scaled_characteristics[SC.F_MIN] = min((
+            sao.scaled_characteristics[SC.F_MIN_F],
+            sao.scaled_characteristics[SC.F_MIN_E]))
+
+        nF2 = self.listWidgetF2.count()
+        if nF2:
+            fohF2 = []
+            for i in range(nF2):
+                fohF2.append(
+                    [float(x) for x in self.listWidgetF2.item(i).text().split()])
+
+            sao.data_file_index[6] = nF2
+            sao.data_file_index[10] = nF2
+            sao.f2_o_heights_virtual = [0.0]*nF2
+            sao.f2_o_frequencies = [0.0]*nF2
+            for i, p in enumerate(fohF2):
+                sao.f2_o_heights_virtual[i] = p[-1]
+                sao.f2_o_frequencies[i] = p[0]
+
+        sao.write(filename)
 
     def save_std(self, filename):
 
@@ -580,25 +661,28 @@ class MainWindow(QMainWindow):
             file.write('END\n')
 
     def save_image(self, filename, **kwargs):
-            width = 10 if 'width' not in kwargs else kwargs['width']
-            height = 5.5 if 'height' not in kwargs else kwargs['height']
-            dpi = 100 if 'dpi' not in kwargs else kwargs['dpi']
-            old_size = self.figure.get_size_inches()
-            self.figure.set_size_inches(width, height)
-            ursi_code = self.ursiCodeEdit.text().strip()
-            time_zone = self.timeZoneComboBox.currentText().strip()
-            title = '{}{}, {} ({})'.format(
-                self.stationNameEdit.text().strip(),
-                ' (' + ursi_code + ')' if ursi_code else '',
-                self.dateTimeEdit.dateTime().toString(DATE_TIME_FORMAT),
-                'UTC' if time_zone == '0' else 'UTC'+time_zone)
-            plt.title(title)
-            plt.tight_layout()
-            self.figure.savefig(filename, dpi=dpi)
-            plt.title('')
-            self.figure.set_size_inches(old_size)
-            plt.tight_layout()
-            self.canvas.draw()
+        width = 10 if 'width' not in kwargs else kwargs['width']
+        height = 6 if 'height' not in kwargs else kwargs['height']
+        dpi = 100 if 'dpi' not in kwargs else kwargs['dpi']
+        old_size = self.figure.get_size_inches()
+        self.figure.set_size_inches(width, height)
+        plt.title(self.get_description())
+        plt.tight_layout()
+        self.figure.savefig(filename, dpi=dpi)
+        plt.title('')
+        self.figure.set_size_inches(old_size)
+        plt.tight_layout()
+        self.canvas.draw()
+
+    def get_description(self):
+        ursi_code = self.ursiCodeEdit.text().strip()
+        time_zone = self.timeZoneComboBox.currentText().strip()
+        description = '{}{}, {} ({})'.format(
+            self.stationNameEdit.text().strip(),
+            ' (' + ursi_code + ')' if ursi_code else '',
+            self.dateTimeEdit.dateTime().toString(DATE_TIME_FORMAT),
+            'UTC' if time_zone == '0' else 'UTC'+time_zone)
+        return description
 
     def show_error(self, message):
         msg = QMessageBox()

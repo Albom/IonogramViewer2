@@ -1,5 +1,6 @@
 
 from math import ceil
+from datetime import datetime
 
 
 class GeophysicalConstants:
@@ -11,15 +12,27 @@ class GeophysicalConstants:
 
 
 class PrefaceAA:
-    def __init__(self, line):
-        self.version = ''.join(line[0:2])
-        self.year = ''.join(line[2:6])
-        self.day_of_year = ''.join(line[6:9])
-        self.month = ''.join(line[9:11])
-        self.day_of_month = ''.join(line[11:13])
-        self.hour = ''.join(line[13:15])
-        self.minutes = ''.join(line[15:17])
-        self.seconds = ''.join(line[17:19])
+    def __init__(self, parameter):
+        if type(parameter) == datetime:
+            date = parameter
+            self.version = 'AA'
+            self.year = str.format('{:04d}', date.year)
+            self.day_of_year = str.format('{:03d}', date.timetuple().tm_yday)
+            self.month = str.format('{:02d}', date.month)
+            self.day_of_month = str.format('{:02d}', date.day)
+            self.hour = str.format('{:02d}', date.hour)
+            self.minutes = str.format('{:02d}', date.minute)
+            self.seconds = str.format('{:02d}', date.second)
+        elif type(parameter) == list:
+            line = parameter
+            self.version = ''.join(line[0:2])
+            self.year = ''.join(line[2:6])
+            self.day_of_year = ''.join(line[6:9])
+            self.month = ''.join(line[9:11])
+            self.day_of_month = ''.join(line[11:13])
+            self.hour = ''.join(line[13:15])
+            self.minutes = ''.join(line[15:17])
+            self.seconds = ''.join(line[17:19])
 
     def __str__(self):
         return ''.join((
@@ -30,12 +43,13 @@ class PrefaceAA:
             self.day_of_month,
             self.hour,
             self.minutes,
-            self.seconds))
+            self.seconds,))
 
 
 class PrefaceFF(PrefaceAA):
     def __init__(self, line):
         super().__init__(line)
+        self.version = 'FF'
         self.receiver_id = ''.join(line[19:22])
         self.transmitter_id = ''.join(line[22:25])
         self.dps_schedule = line[25]
@@ -62,7 +76,10 @@ class PrefaceFF(PrefaceAA):
         self.number_of_ranges = ''.join(line[60:64])
         self.scan_delay = ''.join(line[64:68])
         self.gain = line[68]
+
+        # should be 0 or 1 but sometimes might be equal to 2. why?
         self.frequency_search_enabled = line[69] == '1'
+
         self.operating_mode = line[70]
         self.artist_enabled = line[71] == '1'
         self.data_format = line[72]
@@ -108,10 +125,27 @@ class PrefaceFF(PrefaceAA):
 
 
 class PrefaceFE(PrefaceAA):
-    def __init__(self, line):
-        super().__init__(line)
-        self.timestamp = ''.join(line[19:30])
-        # TODO add another Digisonde 256 System Preface Parameters
+    def __init__(self, parameter):
+        super().__init__(parameter)
+        self.version = 'FE'
+        if type(parameter) == list:
+            self.line = parameter
+            self.timestamp = ''.join(self.line[19:30])
+
+    def __str__(self):
+        if 'line' in vars(self):
+            return ''.join(self.line)
+        else:
+            s = super().__str__() + ''.join((
+                self.year[-2:],
+                self.day_of_year,
+                self.hour,
+                self.minutes,
+                self.seconds,
+                # dirty hack
+                '1152000001000002B31000111332E09841D1534004123A0'))
+            print(s)
+            return s
 
 
 class ScaledCharacteristics:
@@ -245,9 +279,13 @@ class Sao():
             self.geophysical_constants[i] = float(data[row][7*i:7*i+7])
 
         # group 2
-        if self.data_file_index[1] > 0:
-            row += 1
-            self.system_description = data[row].strip()
+        num = self.data_file_index[1]
+        self.system_description = ''
+        if num > 0:
+            for i in range(num):
+                row += 1
+                self.system_description += data[row].strip() \
+                    + ('\n' if i < num-1 else '')
 
         # group 3 (req.)
         row += 1
@@ -720,11 +758,10 @@ class Sao():
         data.append(Sao.convert(
             Sao.to_scientific(self.true_height_coeff_e, 11, 6), '{:11s}', 10))
 
-        data.append(Sao.convert(
-            Sao.to_scientific(self.quazi_parabolic_segments, 20, 12, 2),
-            '{:20s}', 6))
+        data.append(Sao.convert(self.quazi_parabolic_segments, '{:20.12E}', 6))
 
-        data.append(Sao.convert(self.edit_flags, '{:1d}', 120))
+        data.append(Sao.convert(
+            [str(x) for x in self.edit_flags], '{:1s}', 120))
 
         data.append(Sao.convert(
             Sao.to_scientific(self.valley_description, 11, 6), '{:11s}', 10))
@@ -756,7 +793,9 @@ class Sao():
             mantissa, exponent = s.split('E')
             mantissa = str.format(format_mantissa, float(mantissa) / 10)
             mantissa = ('-' if mantissa[0] == '-' else '0') + mantissa[2:]
-            exponent = int(exponent) + 1
+            exponent = int(exponent)
+            if float(mantissa) != 0:
+                exponent += 1
             result.append(str.format(format_out, mantissa, exponent))
         return result
 
@@ -840,7 +879,7 @@ class Sao():
             col = 0
             for i in range(num):
                 doppler_numbers[i] = int(data[row][col:col+1])
-                if col > 119 and i != num-1:
+                if col > 118 and i != num-1:
                     col = 0
                     row += 1
                 else:
@@ -875,9 +914,11 @@ class Sao():
 
 
 if __name__ == '__main__':
-    sao = Sao()
-    sao.load('./examples/sao/test.sao')
-    sao.write('out.txt')
-    #print(sao)
-    # with open('out.txt', 'w') as f:
-    #     f.write(str(sao))
+    names = [
+        'DW41K_2008020070000.SAO', 'KJ609_2009005001000.SAO',
+        'BC840_2009336000005.SAO', 'BL841_2006003000500.SAO']
+    for filename in names:
+        print(filename)
+        sao = Sao()
+        sao.load('./examples/sao/' + filename)
+        sao.write('./examples/sao/out/' + filename)
