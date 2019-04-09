@@ -52,13 +52,13 @@ class KarazinIono(Iono):
         self.data = \
             [[0 for x in range(self.n_freq)] for y in range(self.n_rang)]
 
-        min_val = float("+inf")
+        max_val = float("-inf")
         for f in range(self.n_freq):
             for h in range(self.n_rang):
-                self.data[h][f] = -data_temp[f][self.n_rang - h - 1]
-                if self.data[h][f] < min_val:
-                    min_val = self.data[h][f]
-        self.data[0][0] = -min_val
+                self.data[h][f] = data_temp[f][self.n_rang - h - 1]
+                if self.data[h][f] > max_val:
+                    max_val = self.data[h][f]
+        self.data[0][0] = -max_val
 
     def get_extent(self):
         left = self.freq_to_coord(self.frequencies[0])

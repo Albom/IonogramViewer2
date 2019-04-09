@@ -352,7 +352,11 @@ class MainWindow(QMainWindow):
                     self.ax = self.figure.add_subplot(111)
 
                     extent = self.iono.get_extent()
-                    cmap = colors.ListedColormap(['black', 'white', 'purple'])
+                    cmap = colors.ListedColormap([
+                        '#6E1E5A', '#782064', '#8C189A', '#9F2883',
+                        '#AF4EC2', '#CA89D8', '#D9A8E1', '#FFFFFF',
+                        '#BABABA', '#A0A0A0', '#757575', '#626262',
+                        '#515151', '#474747', '#000000'])
                     self.ax.imshow(data, cmap=cmap, interpolation='nearest',
                                    extent=extent, aspect='auto')
 

@@ -43,10 +43,14 @@ class DpsAmpIono(Iono):
         for i, amp in enumerate(data['Amp']):
             freq = float(data['Freq'][i])
             rang = float(data['Range'][i])
+            pol = int(data['Pol'][i])
+            az = float(data['Az'][i])
+            zn = float(data['Zn'][i])
             i_freq = self.frequencies.index(freq)
             i_rang = self.ranges.index(rang)
-            sign = -1 if float(data['Pol'][i]) > 0 else 1
-            self.data[self.n_rang-i_rang-1][i_freq] = float(amp)*sign
+
+            if az == 0 and zn == 0:
+                self.data[self.n_rang-i_rang-1][i_freq] = float(amp)*pol/90.0
 
     def get_extent(self):
         left = self.frequencies[0]

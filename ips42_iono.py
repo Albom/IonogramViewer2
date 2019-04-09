@@ -27,9 +27,9 @@ class Ips42Iono(Iono):
                 for z in range(16):
                     alt = 511-(h*16+15-z)
                     bit = (data_tuple[i] >> z) & 1
-                    self.data[alt][f] = 0 if bit else -1
+                    self.data[alt][f] = 0 if bit else 1
 
-        self.data[0][0] = 1
+        self.data[0][0] = -1
 
     def get_extent(self):
         left = 0
