@@ -1,4 +1,4 @@
-from math import sqrt, log
+from math import log
 from datetime import datetime
 from iono import Iono
 
@@ -52,7 +52,7 @@ class KarazinIono(Iono):
         self.data = \
             [[0 for x in range(self.n_freq)] for y in range(self.n_rang)]
 
-        max_val = float("-inf")
+        max_val = float('-inf')
         for f in range(self.n_freq):
             for h in range(self.n_rang):
                 self.data[h][f] = data_temp[f][self.n_rang - h - 1]

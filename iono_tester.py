@@ -16,7 +16,11 @@ class IonoTester:
                 'class_name': 'DpsAmpIono'},
             'KARAZIN': {
                 'class_name': 'KarazinIono',
-                'patterns': ['??-??.dat']}
+                'patterns': ['??-??.dat']},
+            'IION': {
+                'class_name': 'IionIono',
+                'patterns': ['NF??????.??', 'B1??????.??', 'B2??????.??'],
+                'sizes': [1200021, 1600021]}
             }
         self.class_name = ''
         self.probability = 0
@@ -78,5 +82,6 @@ if __name__ == '__main__':
     ips = tester.examine('./examples/ips42/00h30m.ion')
     dps = tester.examine('./examples/dps_amp/00_00.txt')
     karazin = tester.examine('./examples/karazin/12-00.dat')
+    iion = tester.examine('./examples/iion/NF190606.50')
     py = tester.examine('./iono_tester.py')
-    print(ips, dps, karazin, py, sep='\n')
+    print(ips, dps, karazin, iion, py, sep='\n')
