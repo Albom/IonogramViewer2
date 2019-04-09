@@ -1,5 +1,6 @@
 from os import path
 from datetime import datetime
+from fnmatch import fnmatch
 
 
 class IonoTester:
@@ -9,10 +10,14 @@ class IonoTester:
                 'class_name': 'Unknown'},
             'IPS42': {
                 'class_name': 'Ips42Iono',
-                'sizes': [36928]},
+                'sizes': [36928],
+                'patterns': ['??h??m.ion']},
             'DPS_AMP': {
-                'class_name': 'DpsAmpIono'
-            }}
+                'class_name': 'DpsAmpIono'},
+            'KARAZIN': {
+                'class_name': 'KarazinIono',
+                'patterns': ['??-??.dat']}
+            }
         self.class_name = ''
         self.probability = 0
         self.points = {x: 0 for x in self.FILE_FORMATS.keys()}
@@ -33,6 +38,11 @@ class IonoTester:
             if 'sizes' in self.FILE_FORMATS[key]:
                 for size in self.FILE_FORMATS[key]['sizes']:
                     if file_size == size:
+                        self.points[key] += 1
+            if 'patterns' in self.FILE_FORMATS[key]:
+                for pattern in self.FILE_FORMATS[key]['patterns']:
+                    (_, name) = path.split(filename)
+                    if fnmatch(name, pattern):
                         self.points[key] += 1
 
         try:
@@ -67,5 +77,6 @@ if __name__ == '__main__':
     tester = IonoTester()
     ips = tester.examine('./examples/ips42/00h30m.ion')
     dps = tester.examine('./examples/dps_amp/00_00.txt')
+    karazin = tester.examine('./examples/karazin/12-00.dat')
     py = tester.examine('./iono_tester.py')
-    print(ips, dps, py, sep='\n')
+    print(ips, dps, karazin, py, sep='\n')
