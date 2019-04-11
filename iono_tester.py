@@ -17,6 +17,9 @@ class IonoTester:
             'KARAZIN': {
                 'class_name': 'KarazinIono',
                 'patterns': ['??-??.dat']},
+            'RIAN': {
+                'class_name': 'RianIono',
+                'patterns': ['????????_????_iono.ion']},
             'IION': {
                 'class_name': 'IionIono',
                 'patterns': ['NF??????.??', 'B1??????.??', 'B2??????.??'],

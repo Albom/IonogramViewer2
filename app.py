@@ -16,6 +16,7 @@ from matplotlib import colors
 
 from iono_tester import IonoTester
 from karazin_iono import KarazinIono
+from rian_iono import RianIono
 from iion_iono import IionIono
 from ips42_iono import Ips42Iono
 from dps_amp_iono import DpsAmpIono
@@ -281,14 +282,15 @@ class MainWindow(QMainWindow):
                 line.remove()
                 line = None
             freq = box.value()
-            if (freq > left) and (freq < right):
+            if freq > 0:
                 f = self.iono.freq_to_coord(freq)
-                line, = self.ax.plot(
-                    [f, f],
-                    [bottom, top],
-                    c=color,
-                    linestyle=style)
-            return line
+                if (f > left) and (f < right):
+                    line, = self.ax.plot(
+                        [f, f],
+                        [bottom, top],
+                        c=color,
+                        linestyle=style)
+                return line
 
         self.f2_critical = plot_line(
             self.doubleSpinBoxF2, self.f2_critical, 'r')
