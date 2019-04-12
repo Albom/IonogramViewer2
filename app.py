@@ -376,6 +376,8 @@ class MainWindow(QMainWindow):
                     self.ursiCodeEdit.setText(
                         self.iono.get_ursi_code() if 'ursi_code' in vars(self.iono) else '')
                     self.dateTimeEdit.setDateTime(self.iono.get_date())
+                    self.latLineEdit.setText(str(self.iono.get_lat()))
+                    self.longLineEdit.setText(str(self.iono.get_lon()))
 
                     time_zone = self.iono.get_timezone()
                     position = self.timeZoneComboBox.findText(

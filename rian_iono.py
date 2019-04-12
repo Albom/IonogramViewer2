@@ -24,8 +24,19 @@ class RianIono(Iono):
         data_temp = [0] * self.n_freq
 
         for i, line in enumerate(lines):
-            if line.startswith('Location'):
-                self.location = line.split(':')[-1].strip()
+            if line.startswith('Observatory'):
+                self.station_name = line.split(':')[-1].strip()
+            elif line.startswith('Location'):
+                location = line.split(':')[-1].strip().split(', ')
+                def convert_to_decimal(coord):
+                    d = float(coord[:2])
+                    m = float(coord[3:5])
+                    s = float(coord[6:8])
+                    return d + m/60 + s/3600
+                lat = convert_to_decimal(location[0][:-2])
+                lon = convert_to_decimal(location[1][:-2])
+                self.lat = lat * (1 if location[0][-1] == 'N' else -1)
+                self.lon = lon * (1 if location[1][-1] == 'E' else -1)
             elif line.startswith('z0'):
                 self.z0 = float(line.split('=')[-1].strip())
             elif line.startswith('dz'):

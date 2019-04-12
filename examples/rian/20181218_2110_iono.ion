@@ -2,7 +2,7 @@ HEADER
 Mode        : Ionozond
 Country     : Ukraine
 Observatory : IION Observatory
-Location    : 49-40-39 N, 36-17-27 W
+Location    : 49-40-39 N, 36-17-27 E
 Config
 z0         = 77.25
 dz         = 0.750

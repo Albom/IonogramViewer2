@@ -8,7 +8,7 @@ class Iono:
         self.station_name = ''
         self.ionosonde_model = ''
         self.lat = 0
-        self.long = 0
+        self.lon = 0
         self.gyro = 0
         self.dip = 0
         self.sunspot = 0
@@ -36,3 +36,9 @@ class Iono:
 
     def set_timezone(self, timezone):
         self.timezone = int(timezone)
+
+    def get_lat(self):
+        return self.lat
+
+    def get_lon(self):
+        return self.lon
