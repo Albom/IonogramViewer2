@@ -53,7 +53,7 @@ class RianIono(Iono):
                 self.frequencies.append(float(line.split()[-1].strip()))
 
             if i > index_data and i < index_end_of_data:
-                row = [float(x) for x in line.split()]
+                row = [log(float(x), 10) for x in line.split()]
                 data_temp[i - index_data - 1] = row
 
         self.n_rang = len(data_temp[0])

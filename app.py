@@ -358,8 +358,9 @@ class MainWindow(QMainWindow):
                     cmap = colors.ListedColormap([
                         '#6E1E5A', '#782064', '#8C189A', '#9F2883',
                         '#AF4EC2', '#CA89D8', '#D9A8E1', '#FFFFFF',
-                        '#BABABA', '#A0A0A0', '#757575', '#626262',
-                        '#515151', '#474747', '#000000'])
+                        '#eeeeee', '#bcbcbc','#aaaaaa',
+                        '#909090', '#606060', '#353535','#000000'
+                        ])
                     self.ax.imshow(data, cmap=cmap, interpolation='nearest',
                                    extent=extent, aspect='auto')
 
