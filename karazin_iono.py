@@ -55,6 +55,8 @@ class KarazinIono(Iono):
             if i > index_data and i < index_end_of_data:
                 if (i - index_data) % 2 == 1:
                     row = [float(x) for x in line.split()]
+                    noise = sum(row)/len(row)
+                    row = [(x - noise) if x > noise else 0 for x in row]
                     data_temp[(i - index_data) // 2] = row
 
         self.n_rang = len(data_temp[0])
