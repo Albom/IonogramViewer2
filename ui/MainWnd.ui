@@ -280,6 +280,7 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
+   <addaction name="actionRemote"/>
    <addaction name="separator"/>
    <addaction name="actionFirst"/>
    <addaction name="actionPrevious"/>
@@ -905,6 +906,18 @@ number</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionRemote">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/folder-remote.png</normaloff>images/folder-remote.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remote</string>
+   </property>
+   <property name="toolTip">
+    <string>Remote source</string>
    </property>
   </action>
  </widget>

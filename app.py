@@ -6,9 +6,10 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QApplication, \
     QFileDialog, QMenu, QMessageBox
+from PyQt5.Qt import QDialog
 
 import matplotlib
-matplotlib.use("agg")
+matplotlib.use('agg')
 from matplotlib.backends.backend_qt5agg \
     import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
@@ -25,6 +26,7 @@ from filelist import FileList
 from sao import Sao, \
     PrefaceAA, PrefaceFE, \
     GeophysicalConstants as GC, ScaledCharacteristics as SC
+from shigaraki_loader import ShigarakiLoader
 
 DATE_TIME_FORMAT = 'yyyy-MM-dd hh:mm'
 
@@ -95,7 +97,7 @@ class MainWindow(QMainWindow):
         items = [str.format('{:>+3d}' if i != 0 else '{:>3d}', i)
                  for i in range(-11, 13)]
         self.timeZoneComboBox.addItems(items)
-        font = QFont("Monospace")
+        font = QFont('Monospace')
         font.setStyleHint(QFont.TypeWriter)
         self.timeZoneComboBox.setFont(font)
 
@@ -110,7 +112,14 @@ class MainWindow(QMainWindow):
         self.clear_all()
 
         self.setWindowTitle(self.program_name)
+
+        self.actionRemote.triggered.connect(self.remote)
+
         self.showMaximized()
+
+    def remote(self):
+        wnd = RemoteWnd()
+        wnd.exec_()
 
     def png_state_changed(self, state):
         s = state == Qt.Checked
@@ -370,7 +379,7 @@ class MainWindow(QMainWindow):
                     self.ax.set_xticklabels(labels)
 
                     plt.tight_layout()
-                    self.setWindowTitle(self.program_name + " - " + file_name)
+                    self.setWindowTitle(self.program_name + ' - ' + file_name)
                     self.canvas.draw()
 
                     self.stationNameEdit.setText(self.iono.get_station_name())
@@ -698,7 +707,7 @@ class MainWindow(QMainWindow):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
         msg.setText(message)
-        msg.setWindowTitle("Error")
+        msg.setWindowTitle('Error')
         msg.show()
         msg.exec_()
 
@@ -712,10 +721,45 @@ class MainWindow(QMainWindow):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
         msg.setText(self.program_name + about)
-        msg.setWindowTitle("About")
+        msg.setWindowTitle('About')
         msg.show()
         msg.exec_()
 
+
+class RemoteWnd(QDialog):
+
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('./ui/RemoteWnd.ui', self)
+        self.setModal(True)
+        self.importButton.clicked.connect(self.import_button_clicked)
+        self.sourceComboBox.addItem('database.rish.kyoto-u.ac.jp')
+        self.ionosondeComboBox.addItem('Shigaraki')
+        self.startDateTimeEdit.setDisplayFormat(DATE_TIME_FORMAT)
+        self.endDateTimeEdit.setDisplayFormat(DATE_TIME_FORMAT)
+        self.show()
+
+    def import_button_clicked(self):
+        directory_name = str(QFileDialog.getExistingDirectory(self))
+        if directory_name:
+            index = self.sourceComboBox.currentIndex()
+            ionosonde = self.ionosondeComboBox.currentIndex()
+            proxy_host = self.proxyHostLineEdit.text()
+            proxy_port = self.proxyPortLineEdit.text()
+            start = self.startDateTimeEdit.dateTime().toString(DATE_TIME_FORMAT)
+            end = self.endDateTimeEdit.dateTime().toString(DATE_TIME_FORMAT)
+            start = datetime.strptime(start, '%Y-%m-%d %H:%M')
+            end = datetime.strptime(end, '%Y-%m-%d %H:%M')
+            if index == 0 and ionosonde == 0:
+                loader = ShigarakiLoader(proxy_host, proxy_port)
+                n_files = loader.saveTo(directory_name, start, end)
+
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Information)
+                msg.setText(str(n_files) + ' file(s) loaded.')
+                msg.setWindowTitle('Remote')
+                msg.show()
+                msg.exec_()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
