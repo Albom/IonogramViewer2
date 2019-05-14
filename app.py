@@ -21,6 +21,7 @@ from rian_iono import RianIono
 from iion_iono import IionIono
 from ips42_iono import Ips42Iono
 from dps_amp_iono import DpsAmpIono
+from shigaraki_iono import ShigarakiIono
 
 from filelist import FileList
 from sao import Sao, \
@@ -37,7 +38,7 @@ class MainWindow(QMainWindow):
 
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.3 pre'
+        self.program_name = 'IonogramViewer2 v1.3'
         self.file_name = ''
         self.iono = None
         self.ax = None
@@ -388,6 +389,8 @@ class MainWindow(QMainWindow):
                     self.dateTimeEdit.setDateTime(self.iono.get_date())
                     self.latLineEdit.setText(str(self.iono.get_lat()))
                     self.longLineEdit.setText(str(self.iono.get_lon()))
+                    self.gyrofrequencyLineEdit.setText(str(self.iono.get_gyro()))
+                    self.dipAngleLineEdit.setText(str(self.iono.get_dip()))
 
                     time_zone = self.iono.get_timezone()
                     position = self.timeZoneComboBox.findText(

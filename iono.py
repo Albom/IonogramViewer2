@@ -42,3 +42,9 @@ class Iono:
 
     def get_lon(self):
         return self.lon
+
+    def get_gyro(self):
+        return self.gyro
+
+    def get_dip(self):
+        return self.dip

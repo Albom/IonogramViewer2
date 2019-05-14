@@ -23,7 +23,10 @@ class IonoTester:
             'IION': {
                 'class_name': 'IionIono',
                 'patterns': ['NF??????.??', 'B1??????.??', 'B2??????.??'],
-                'sizes': [1200021, 1600021]}
+                'sizes': [1200021, 1600021]},
+            'Shigaraki': {
+                'class_name': 'ShigarakiIono',
+                'patterns': ['????????????_ionogram.txt']}
             }
         self.class_name = ''
         self.probability = 0
