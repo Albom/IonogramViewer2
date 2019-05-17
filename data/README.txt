@@ -1,0 +1,1 @@
+Sunspot number file SN_d_tot_V2.0.txt could be updated from http://www.sidc.be/silso/DATA/SN_d_tot_V2.0.txt

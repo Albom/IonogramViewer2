@@ -1,4 +1,8 @@
 
+from datetime import datetime, timedelta
+from sunspot_loader import SunspotLoader
+
+
 class Iono:
 
     def __init__(self):
@@ -11,7 +15,7 @@ class Iono:
         self.lon = 0
         self.gyro = 0
         self.dip = 0
-        self.sunspot = 0
+        self.sunspot = -1
 
     def get_data(self):
         return self.data
@@ -48,3 +52,10 @@ class Iono:
 
     def get_dip(self):
         return self.dip
+
+    def get_sunspot(self):
+        return self.sunspot
+
+    def load_sunspot(self):
+        loader = SunspotLoader()
+        self.sunspot = loader.get(self.date + timedelta(hours=-self.timezone))

@@ -42,6 +42,8 @@ class ShigarakiIono(Iono):
         self.data.reverse()
         self.data[0][0] = -m
 
+        self.load_sunspot()
+
     def get_altitude(self, h):
         return h
 
@@ -63,4 +65,4 @@ class ShigarakiIono(Iono):
 if __name__ == '__main__':
     iono = ShigarakiIono()
     iono.load('./examples/shigaraki/201806071645_ionogram.txt')
-    #print(iono.date, iono.get_extent(), iono.altitudes)
+    print(iono.date, iono.sunspot)

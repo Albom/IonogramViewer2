@@ -52,6 +52,8 @@ class DpsAmpIono(Iono):
             if az == 0 and zn == 0:
                 self.data[self.n_rang-i_rang-1][i_freq] = float(amp)*pol/90.0
 
+        self.load_sunspot()
+
     def get_extent(self):
         left = self.frequencies[0]
         right = self.frequencies[-1]

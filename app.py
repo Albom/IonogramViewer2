@@ -392,6 +392,10 @@ class MainWindow(QMainWindow):
                     self.gyrofrequencyLineEdit.setText(str(self.iono.get_gyro()))
                     self.dipAngleLineEdit.setText(str(self.iono.get_dip()))
 
+                    sunspot = self.iono.get_sunspot()
+                    if sunspot != -1:
+                        self.sunspotNumberLineEdit.setText(str(sunspot))
+
                     time_zone = self.iono.get_timezone()
                     position = self.timeZoneComboBox.findText(
                         str.format('{:>+3d}' if time_zone != 0 else '{:>3d}', time_zone))

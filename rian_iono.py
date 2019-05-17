@@ -70,6 +70,8 @@ class RianIono(Iono):
                     max_val = self.data[h][f]
         self.data[0][0] = -max_val
 
+        self.load_sunspot()
+
     def get_extent(self):
         left = self.freq_to_coord(self.frequencies[0])
         right = self.freq_to_coord(self.frequencies[-1])
