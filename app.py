@@ -333,7 +333,8 @@ class MainWindow(QMainWindow):
 
     def open_file_dialog(self):
         file_name, _ = QFileDialog.getOpenFileName(self)
-        self.open_file(file_name)
+        if file_name:
+            self.open_file(file_name)
 
     def close_file(self):
         self.clear_all()
@@ -344,67 +345,61 @@ class MainWindow(QMainWindow):
         self.canvas.draw()
 
     def open_file(self, file_name):
+        tester = IonoTester()
+        class_name = tester.examine(file_name)['class_name']
+        if class_name != 'Unknown':
+            self.close_file()
+            class_ = globals()[class_name]
+            self.iono = class_()
+            self.iono.load(file_name)
+            data = self.iono.get_data()
+            if data:
 
-        self.close_file()
+                self.file_name = file_name
 
-        self.setWindowTitle(self.program_name)
-        if file_name:
-            self.clear_all()
+                self.ax = self.figure.add_subplot(111)
 
-            tester = IonoTester()
-            class_name = tester.examine(file_name)['class_name']
-            if class_name != 'Unknown':
-                class_ = globals()[class_name]
-                self.iono = class_()
-                self.iono.load(file_name)
-                data = self.iono.get_data()
-                if data:
+                extent = self.iono.get_extent()
+                cmap = colors.ListedColormap([
+                    '#6E1E5A', '#782064', '#8C189A', '#9F2883',
+                    '#AF4EC2', '#CA89D8', '#D9A8E1', '#FFFFFF',
+                    '#eeeeee', '#bcbcbc','#aaaaaa',
+                    '#909090', '#606060', '#353535','#000000'
+                    ])
+                self.ax.imshow(data, cmap=cmap, interpolation='nearest',
+                                extent=extent, aspect='auto')
 
-                    self.file_name = file_name
+                tics = self.iono.get_freq_tics()
+                labels = self.iono.get_freq_labels()
+                self.ax.set_xticks(tics)
+                self.ax.set_xticklabels(labels)
 
-                    self.ax = self.figure.add_subplot(111)
+                plt.tight_layout()
+                self.setWindowTitle(self.program_name + ' - ' + file_name)
+                self.canvas.draw()
 
-                    extent = self.iono.get_extent()
-                    cmap = colors.ListedColormap([
-                        '#6E1E5A', '#782064', '#8C189A', '#9F2883',
-                        '#AF4EC2', '#CA89D8', '#D9A8E1', '#FFFFFF',
-                        '#eeeeee', '#bcbcbc','#aaaaaa',
-                        '#909090', '#606060', '#353535','#000000'
-                        ])
-                    self.ax.imshow(data, cmap=cmap, interpolation='nearest',
-                                   extent=extent, aspect='auto')
+                self.stationNameEdit.setText(self.iono.get_station_name())
+                self.ursiCodeEdit.setText(
+                    self.iono.get_ursi_code() if 'ursi_code' in vars(self.iono) else '')
+                self.dateTimeEdit.setDateTime(self.iono.get_date())
+                self.latLineEdit.setText(str(self.iono.get_lat()))
+                self.longLineEdit.setText(str(self.iono.get_lon()))
+                self.gyrofrequencyLineEdit.setText(str(self.iono.get_gyro()))
+                self.dipAngleLineEdit.setText(str(self.iono.get_dip()))
 
-                    tics = self.iono.get_freq_tics()
-                    labels = self.iono.get_freq_labels()
-                    self.ax.set_xticks(tics)
-                    self.ax.set_xticklabels(labels)
+                sunspot = self.iono.get_sunspot()
+                if sunspot != -1:
+                    self.sunspotNumberLineEdit.setText(str(sunspot))
 
-                    plt.tight_layout()
-                    self.setWindowTitle(self.program_name + ' - ' + file_name)
-                    self.canvas.draw()
+                time_zone = self.iono.get_timezone()
+                position = self.timeZoneComboBox.findText(
+                    str.format('{:>+3d}' if time_zone != 0 else '{:>3d}', time_zone))
+                self.timeZoneComboBox.setCurrentIndex(position)
+                _ = [e.setEnabled(True) for e in self.properties_of_iono]
 
-                    self.stationNameEdit.setText(self.iono.get_station_name())
-                    self.ursiCodeEdit.setText(
-                        self.iono.get_ursi_code() if 'ursi_code' in vars(self.iono) else '')
-                    self.dateTimeEdit.setDateTime(self.iono.get_date())
-                    self.latLineEdit.setText(str(self.iono.get_lat()))
-                    self.longLineEdit.setText(str(self.iono.get_lon()))
-                    self.gyrofrequencyLineEdit.setText(str(self.iono.get_gyro()))
-                    self.dipAngleLineEdit.setText(str(self.iono.get_dip()))
-
-                    sunspot = self.iono.get_sunspot()
-                    if sunspot != -1:
-                        self.sunspotNumberLineEdit.setText(str(sunspot))
-
-                    time_zone = self.iono.get_timezone()
-                    position = self.timeZoneComboBox.findText(
-                        str.format('{:>+3d}' if time_zone != 0 else '{:>3d}', time_zone))
-                    self.timeZoneComboBox.setCurrentIndex(position)
-                    _ = [e.setEnabled(True) for e in self.properties_of_iono]
-
-                    self.load_text_info()
-            else:
-                self.show_error('File format is not supported.')
+                self.load_text_info()
+        else:
+            self.show_error('File format is not supported.')
 
     def open_next_file(self):
         if self.file_name:
