@@ -47,6 +47,8 @@ class RianIono(Iono):
                 self.nsound = int(line.split('=')[-1].strip())
             elif line.startswith('TIME'):
                 date = line.split('=')[-1].strip()
+                if date.endswith(' UT'):
+                    date = date[:-3]
                 self.date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
 
             if i > index_freq and i < index_end_of_header:
