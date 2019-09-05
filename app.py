@@ -449,8 +449,13 @@ class MainWindow(QMainWindow):
     def load_text_info(self):
         try:
             with open(self.file_name + '.STD', 'r') as file:
-                (self.iono.station_name,
-                 timezone) = file.readline().strip().split('//')
+                first_line = file.readline().strip()
+                if '//' in first_line:
+                    (self.iono.station_name,
+                     timezone) = first_line.strip().split('//')
+                else:
+                    self.iono.station_name = first_line
+                    timezone = 0
                 (self.iono.lat, self.iono.long,
                  self.iono.gyro, self.iono.dip,
                  self.iono.sunspot) = file.readline().strip().split()
