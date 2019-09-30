@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
 
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.3'
+        self.program_name = 'IonogramViewer2 v1.4'
         self.file_name = ''
         self.iono = None
         self.ax = None

@@ -8,8 +8,8 @@ from iono import Iono
 
 class Ips42Iono(Iono):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, debug_level=0):
+        super().__init__(debug_level)
         self.ionosonde_model = 'IPS-42'
 
     def load(self, file_name):
@@ -138,12 +138,12 @@ class Ips42Iono(Iono):
                   A | B | C | F | G  # 9
                  ]
 
-        """
-        for h in range(25):
-            for f in range(13):
-                print(self.data[offset_alt+h][offset_f+f], end='')
+        if self.debug_level > 0:
+            for h in range(25):
+                for f in range(13):
+                    print(self.data[offset_alt+h][offset_f+f], end='')
+                print()
             print()
-        """
 
         a = self.data[offset_alt][offset_f+7]
         b = self.data[offset_alt+6][offset_f+12]
@@ -187,5 +187,5 @@ class Ips42Iono(Iono):
 
 
 if __name__ == '__main__':
-    iono = Ips42Iono()
+    iono = Ips42Iono(debug_level=1)
     iono.load('./examples/ips42/01h00m.ion')

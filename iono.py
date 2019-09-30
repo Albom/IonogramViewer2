@@ -5,7 +5,7 @@ from sunspot_loader import SunspotLoader
 
 class Iono:
 
-    def __init__(self):
+    def __init__(self, debug_level=0):
         self.data = None
         self.date = None
         self.timezone = 0
@@ -16,6 +16,7 @@ class Iono:
         self.gyro = 0
         self.dip = 0
         self.sunspot = -1
+        self.debug_level = debug_level
 
     def get_data(self):
         return self.data
