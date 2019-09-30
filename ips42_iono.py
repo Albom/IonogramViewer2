@@ -29,71 +29,91 @@ class Ips42Iono(Iono):
                     self.data[alt][f] = 0 if bit else 1
 
         self.data[0][0] = -1
+
         self._extract_info()
-        self.load_sunspot()
+        if self.date:
+            self.load_sunspot()
 
     def _extract_info(self):
 
-        s4 = self._img2digit(36, 0)
-        s3 = self._img2digit(36, 16)
-        s2 = self._img2digit(36, 32)
-        s1 = self._img2digit(36, 48)
-        station = s4*1000 + s3*100 + s2*10 + s1
-
-        y2 = self._img2digit(36, 80)
-        y1 = self._img2digit(36, 96)
-        year = y2*10 + y1
-        year += 1900 if year > 57 else 2000
-
-        d3 = self._img2digit(36, 128)
-        d2 = self._img2digit(36, 144)
-        d1 = self._img2digit(36, 160)
-        doy = d3*100+d2*10+d1
-
-        h2 = self._img2digit(36, 192)
-        h1 = self._img2digit(36, 208)
-        hour = h2*10 + h1
-
-        m2 = self._img2digit(36, 224)
-        m1 = self._img2digit(36, 240)
-        minute = m2*10 + m1
-
-        self.date = datetime(year, 1, 1, hour, minute, 0)
-        self.date += timedelta(doy-1)
-
-        config = ConfigParser()
-        config_path = './data/IPS-42.ini'
-        config.read(config_path)
-
         try:
-            self.station_name = config.get(str(station), 'name')
-        except (NoSectionError):
+            s4 = self._img2digit(36, 0)
+            s3 = self._img2digit(36, 16)
+            s2 = self._img2digit(36, 32)
+            s1 = self._img2digit(36, 48)
+            station = s4*1000 + s3*100 + s2*10 + s1
+        except ValueError:
             pass
 
         try:
-            self.lat = config.get(str(station), 'lat')
-        except (NoSectionError):
+            y2 = self._img2digit(36, 80)
+            y1 = self._img2digit(36, 96)
+            year = y2*10 + y1
+            year += 1900 if year > 57 else 2000
+        except ValueError:
             pass
 
         try:
-            self.lon = config.get(str(station), 'lon')
-        except (NoSectionError):
+            d3 = self._img2digit(36, 128)
+            d2 = self._img2digit(36, 144)
+            d1 = self._img2digit(36, 160)
+            doy = d3*100+d2*10+d1
+        except ValueError:
             pass
 
         try:
-            self.gyro = config.get(str(station), 'gyro')
-        except (NoSectionError):
+            h2 = self._img2digit(36, 192)
+            h1 = self._img2digit(36, 208)
+            hour = h2*10 + h1
+        except ValueError:
             pass
 
         try:
-            self.dip = config.get(str(station), 'dip')
-        except (NoSectionError):
+            m2 = self._img2digit(36, 224)
+            m1 = self._img2digit(36, 240)
+            minute = m2*10 + m1
+        except ValueError:
             pass
 
-        try:
-            self.timezone = int(config.get(str(station), 'timezone'))
-        except (NoSectionError, ValueError):
-            pass
+        names = vars()
+        if ('year' in names) and ('hour' in names) and ('minute' in names):
+            self.date = datetime(year, 1, 1, hour, minute, 0)
+            self.date += timedelta(doy-1)
+
+        if 'station' in names:
+            config = ConfigParser()
+            config_path = './data/IPS-42.ini'
+            config.read(config_path)
+
+            try:
+                self.station_name = config.get(str(station), 'name')
+            except (NoSectionError):
+                pass
+
+            try:
+                self.lat = config.get(str(station), 'lat')
+            except (NoSectionError):
+                pass
+
+            try:
+                self.lon = config.get(str(station), 'lon')
+            except (NoSectionError):
+                pass
+
+            try:
+                self.gyro = config.get(str(station), 'gyro')
+            except (NoSectionError):
+                pass
+
+            try:
+                self.dip = config.get(str(station), 'dip')
+            except (NoSectionError):
+                pass
+
+            try:
+                self.timezone = int(config.get(str(station), 'timezone'))
+            except (NoSectionError, ValueError):
+                pass
 
     def _img2digit(self, offset_alt, offset_f):
         A = 1
