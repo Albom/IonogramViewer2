@@ -34,86 +34,89 @@ class Ips42Iono(Iono):
         if self.date:
             self.load_sunspot()
 
+    def _digit_recognize(self, offset_f):
+        offset_alt = 36
+        digit = None
+        for da in range(-1, 2):
+            for df in range(-1, 2):
+                try:
+                    digit = self._img2digit(offset_alt+da, offset_f+df)
+                except ValueError:
+                    pass
+                else:
+                    return digit
+        self._print_digit(offset_alt, offset_f)
+        raise ValueError('Digit is not recognized')
+
     def _extract_info(self):
 
+        s4 = self._digit_recognize(0)
+        s3 = self._digit_recognize(16)
+        s2 = self._digit_recognize(32)
+        s1 = self._digit_recognize(48)
+        station = s4*1000 + s3*100 + s2*10 + s1
+
+        y2 = self._digit_recognize(80)
+        y1 = self._digit_recognize(96)
+        year = y2*10 + y1
+        year += 1900 if year > 57 else 2000
+
+        d3 = self._digit_recognize(128)
+        d2 = self._digit_recognize(144)
+        d1 = self._digit_recognize(160)
+        doy = d3*100+d2*10+d1
+
+        h2 = self._digit_recognize(192)
+        h1 = self._digit_recognize(208)
+        hour = h2*10 + h1
+
+        m2 = self._digit_recognize(224)
+        m1 = self._digit_recognize(240)
+        minute = m2*10 + m1
+
+        self.date = datetime(year, 1, 1, hour, minute, 0)
+        self.date += timedelta(doy-1)
+
+        config = ConfigParser()
+        config_path = './data/IPS-42.ini'
+        config.read(config_path)
+
         try:
-            s4 = self._img2digit(36, 0)
-            s3 = self._img2digit(36, 16)
-            s2 = self._img2digit(36, 32)
-            s1 = self._img2digit(36, 48)
-            station = s4*1000 + s3*100 + s2*10 + s1
-        except ValueError:
+            self.station_name = config.get(str(station), 'name')
+        except (NoSectionError):
             pass
 
         try:
-            y2 = self._img2digit(36, 80)
-            y1 = self._img2digit(36, 96)
-            year = y2*10 + y1
-            year += 1900 if year > 57 else 2000
-        except ValueError:
+            self.lat = config.get(str(station), 'lat')
+        except (NoSectionError):
             pass
 
         try:
-            d3 = self._img2digit(36, 128)
-            d2 = self._img2digit(36, 144)
-            d1 = self._img2digit(36, 160)
-            doy = d3*100+d2*10+d1
-        except ValueError:
+            self.lon = config.get(str(station), 'lon')
+        except (NoSectionError):
             pass
 
         try:
-            h2 = self._img2digit(36, 192)
-            h1 = self._img2digit(36, 208)
-            hour = h2*10 + h1
-        except ValueError:
+            self.gyro = config.get(str(station), 'gyro')
+        except (NoSectionError):
             pass
-
-        try:
-            m2 = self._img2digit(36, 224)
-            m1 = self._img2digit(36, 240)
-            minute = m2*10 + m1
-        except ValueError:
-            pass
-
-        names = vars()
-        if ('year' in names) and ('hour' in names) and ('minute' in names):
-            self.date = datetime(year, 1, 1, hour, minute, 0)
-            self.date += timedelta(doy-1)
-
-        if 'station' in names:
-            config = ConfigParser()
-            config_path = './data/IPS-42.ini'
-            config.read(config_path)
-
-            try:
-                self.station_name = config.get(str(station), 'name')
-            except (NoSectionError):
-                pass
-
-            try:
-                self.lat = config.get(str(station), 'lat')
-            except (NoSectionError):
-                pass
-
-            try:
-                self.lon = config.get(str(station), 'lon')
-            except (NoSectionError):
-                pass
-
-            try:
-                self.gyro = config.get(str(station), 'gyro')
-            except (NoSectionError):
-                pass
 
             try:
                 self.dip = config.get(str(station), 'dip')
             except (NoSectionError):
                 pass
 
-            try:
-                self.timezone = int(config.get(str(station), 'timezone'))
-            except (NoSectionError, ValueError):
-                pass
+        try:
+            self.timezone = int(config.get(str(station), 'timezone'))
+        except (NoSectionError, ValueError):
+            pass
+
+    def _print_digit(self, offset_alt, offset_f):
+        for h in range(25):
+            print()
+            for f in range(13):
+                print(self.data[offset_alt+h][offset_f+f], end='')
+        print()
 
     def _img2digit(self, offset_alt, offset_f):
         A = 1
@@ -139,30 +142,51 @@ class Ips42Iono(Iono):
                  ]
 
         if self.debug_level > 0:
-            for h in range(25):
-                for f in range(13):
-                    print(self.data[offset_alt+h][offset_f+f], end='')
-                print()
-            print()
+            self._print_digit(offset_alt, offset_f)
 
-        a = self.data[offset_alt][offset_f+7]
-        b = self.data[offset_alt+6][offset_f+12]
-        c = self.data[offset_alt+18][offset_f+12]
-        d = self.data[offset_alt+24][offset_f+7]
-        e = self.data[offset_alt+18][offset_f]
-        f = self.data[offset_alt+6][offset_f]
-        g = self.data[offset_alt+12][offset_f+7]
-        h = self.data[offset_alt+6][offset_f+6]
-        j = self.data[offset_alt+18][offset_f+6]
+        """
+        aaaaaaaaaaaaa
+        f     h     b
+        f     h     b
+        f     h     b
+        f     h     b
+        f     h     b
+        ggggggggggggg
+        e     j     c
+        e     j     c
+        e     j     c
+        e     j     c
+        e     j     c
+        ddddddddddddd
+        """
+        a = (sum(self.data[offset_alt][offset_f:offset_f+13]) +
+             sum(self.data[offset_alt+1][offset_f:offset_f+13]))
+        b = sum([self.data[offset_alt+i][offset_f+12] for i in range(13)])
+        c = sum([self.data[offset_alt+i+13][offset_f+12] for i in range(13)])
+        d = (sum(self.data[offset_alt+23][offset_f:offset_f+13]) +
+             sum(self.data[offset_alt+24][offset_f:offset_f+13]))
+        e = sum([self.data[offset_alt+i+13][offset_f] for i in range(13)])
+
+        f = sum([self.data[offset_alt+i][offset_f] for i in range(13)])
+        g = (sum(self.data[offset_alt+12][offset_f:offset_f+13]) +
+             sum(self.data[offset_alt+13][offset_f:offset_f+13]))
+
+        h = sum([self.data[offset_alt+i][offset_f+6] for i in range(13)])
+        j = sum([self.data[offset_alt+i+13][offset_f+6] for i in range(13)])
+
         array = [a, b, c, d, e, f, g, h, j]
+
+        if self.debug_level > 0:
+            print(array)
 
         p = 0
         for i, e in enumerate(array):
-            p |= e << i
+            p |= (e > 8) << i
 
         for i, d in enumerate(digits):
             if d == p:
                 return i
+
         raise ValueError('Digit is not recognized')
 
     def get_extent(self):
@@ -188,4 +212,5 @@ class Ips42Iono(Iono):
 
 if __name__ == '__main__':
     iono = Ips42Iono(debug_level=1)
-    iono.load('./examples/ips42/01h00m.ion')
+    iono.load('./examples/ips42/08h45m.ion')
+    #iono.load('h:/Data/Verndasky/IPS_42/2019/Jun/08h45m.ion')
