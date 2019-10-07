@@ -94,32 +94,32 @@ class Ips42Iono(Iono):
 
             try:
                 self.station_name = config.get(str(station), 'name')
-            except (NoSectionError):
+            except (NoSectionError, NoOptionError):
                 pass
 
             try:
                 self.lat = config.get(str(station), 'lat')
-            except (NoSectionError):
+            except (NoSectionError, NoOptionError):
                 pass
 
             try:
                 self.lon = config.get(str(station), 'lon')
-            except (NoSectionError):
+            except (NoSectionError, NoOptionError):
                 pass
 
             try:
                 self.gyro = config.get(str(station), 'gyro')
-            except (NoSectionError):
+            except (NoSectionError, NoOptionError):
                 pass
 
             try:
                 self.dip = config.get(str(station), 'dip')
-            except (NoSectionError):
+            except (NoSectionError, NoOptionError):
                 pass
 
             try:
                 self.timezone = int(config.get(str(station), 'timezone'))
-            except (NoSectionError, ValueError):
+            except (NoSectionError, NoOptionError, ValueError):
                 pass
 
     def _print_digit(self, offset_alt, offset_f):
