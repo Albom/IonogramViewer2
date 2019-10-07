@@ -51,66 +51,76 @@ class Ips42Iono(Iono):
 
     def _extract_info(self):
 
-        s4 = self._digit_recognize(0)
-        s3 = self._digit_recognize(16)
-        s2 = self._digit_recognize(32)
-        s1 = self._digit_recognize(48)
-        station = s4*1000 + s3*100 + s2*10 + s1
+        try:
+            y2 = self._digit_recognize(80)
+            y1 = self._digit_recognize(96)
+            year = y2*10 + y1
+            year += 1900 if year > 57 else 2000
 
-        y2 = self._digit_recognize(80)
-        y1 = self._digit_recognize(96)
-        year = y2*10 + y1
-        year += 1900 if year > 57 else 2000
+            d3 = self._digit_recognize(128)
+            d2 = self._digit_recognize(144)
+            d1 = self._digit_recognize(160)
+            doy = d3*100+d2*10+d1
 
-        d3 = self._digit_recognize(128)
-        d2 = self._digit_recognize(144)
-        d1 = self._digit_recognize(160)
-        doy = d3*100+d2*10+d1
+            h2 = self._digit_recognize(192)
+            h1 = self._digit_recognize(208)
+            hour = h2*10 + h1
 
-        h2 = self._digit_recognize(192)
-        h1 = self._digit_recognize(208)
-        hour = h2*10 + h1
+            m2 = self._digit_recognize(224)
+            m1 = self._digit_recognize(240)
+            minute = m2*10 + m1
 
-        m2 = self._digit_recognize(224)
-        m1 = self._digit_recognize(240)
-        minute = m2*10 + m1
-
-        self.date = datetime(year, 1, 1, hour, minute, 0)
-        self.date += timedelta(doy-1)
-
-        config = ConfigParser()
-        config_path = './data/IPS-42.ini'
-        config.read(config_path)
+            self.date = datetime(year, 1, 1, hour, minute, 0)
+            self.date += timedelta(doy-1)
+        except ValueError:
+            self.date = datetime.now()
+            print('Date is not recognized. Current date is used.')
 
         try:
-            self.station_name = config.get(str(station), 'name')
-        except (NoSectionError):
-            pass
+            s4 = self._digit_recognize(0)
+            s3 = self._digit_recognize(16)
+            s2 = self._digit_recognize(32)
+            s1 = self._digit_recognize(48)
+            station = s4*1000 + s3*100 + s2*10 + s1
+            is_station = True
+        except ValueError:
+            is_station = False
+            print('Station is not recognized. Default parameters are used.')
 
-        try:
-            self.lat = config.get(str(station), 'lat')
-        except (NoSectionError):
-            pass
+        if is_station:
+            config = ConfigParser()
+            config_path = './data/IPS-42.ini'
+            config.read(config_path)
 
-        try:
-            self.lon = config.get(str(station), 'lon')
-        except (NoSectionError):
-            pass
+            try:
+                self.station_name = config.get(str(station), 'name')
+            except (NoSectionError):
+                pass
 
-        try:
-            self.gyro = config.get(str(station), 'gyro')
-        except (NoSectionError):
-            pass
+            try:
+                self.lat = config.get(str(station), 'lat')
+            except (NoSectionError):
+                pass
+
+            try:
+                self.lon = config.get(str(station), 'lon')
+            except (NoSectionError):
+                pass
+
+            try:
+                self.gyro = config.get(str(station), 'gyro')
+            except (NoSectionError):
+                pass
 
             try:
                 self.dip = config.get(str(station), 'dip')
             except (NoSectionError):
                 pass
 
-        try:
-            self.timezone = int(config.get(str(station), 'timezone'))
-        except (NoSectionError, ValueError):
-            pass
+            try:
+                self.timezone = int(config.get(str(station), 'timezone'))
+            except (NoSectionError, ValueError):
+                pass
 
     def _print_digit(self, offset_alt, offset_f):
         for h in range(25):

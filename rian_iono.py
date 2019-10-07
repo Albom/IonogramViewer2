@@ -1,5 +1,6 @@
 from math import log
 from datetime import datetime
+from configparser import ConfigParser, NoSectionError, NoOptionError
 from iono import Iono
 
 
@@ -73,6 +74,25 @@ class RianIono(Iono):
         self.data[0][0] = -max_val
 
         self.load_sunspot()
+
+        config = ConfigParser()
+        config_path = './data/Rian.ini'
+        config.read(config_path)
+
+        if self.lat > 0:
+            station = 'IION'
+        else:
+            station = 'UAS'
+
+        try:
+            self.gyro = config.get(station, 'gyro')
+        except (NoSectionError):
+            pass
+
+        try:
+            self.dip = config.get(station, 'dip')
+        except (NoSectionError):
+            pass
 
     def get_extent(self):
         left = self.freq_to_coord(self.frequencies[0])
