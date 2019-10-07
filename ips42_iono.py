@@ -45,7 +45,8 @@ class Ips42Iono(Iono):
                     pass
                 else:
                     return digit
-        self._print_digit(offset_alt, offset_f)
+        if self.debug_level == 0:
+            self._print_digit(offset_alt, offset_f)
         raise ValueError('Digit is not recognized')
 
     def _extract_info(self):
@@ -119,6 +120,7 @@ class Ips42Iono(Iono):
         print()
 
     def _img2digit(self, offset_alt, offset_f):
+        LEVEL = 8
         A = 1
         B = 1 << 1
         C = 1 << 2
@@ -143,6 +145,7 @@ class Ips42Iono(Iono):
 
         if self.debug_level > 0:
             self._print_digit(offset_alt, offset_f)
+            print(offset_alt, offset_f, sep=', ')
 
         """
         aaaaaaaaaaaaa
@@ -179,9 +182,12 @@ class Ips42Iono(Iono):
         if self.debug_level > 0:
             print(array)
 
+        if self.debug_level > 0:
+            print([i > LEVEL for i in array])
+
         p = 0
         for i, e in enumerate(array):
-            p |= (e > 8) << i
+            p |= (e > LEVEL) << i
 
         for i, d in enumerate(digits):
             if d == p:
@@ -213,4 +219,3 @@ class Ips42Iono(Iono):
 if __name__ == '__main__':
     iono = Ips42Iono(debug_level=1)
     iono.load('./examples/ips42/08h45m.ion')
-    #iono.load('h:/Data/Verndasky/IPS_42/2019/Jun/08h45m.ion')
