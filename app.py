@@ -17,7 +17,7 @@ from matplotlib import colors
 
 from iono_tester import IonoTester
 from karazin_iono import KarazinIono
-from rian_iono import RianIono
+from rinan_iono import RinanIono
 from iion_iono import IionIono
 from ips42_iono import Ips42Iono
 from dps_amp_iono import DpsAmpIono
