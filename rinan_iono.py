@@ -1,12 +1,10 @@
-from math import log, isclose
+from math import log
 from datetime import datetime
 from configparser import ConfigParser, NoSectionError, NoOptionError
 from iono import Iono
 
 
 class RinanIono(Iono):
-
-    TOLERANCE = 1e-4
 
     def __init__(self):
         super().__init__()
