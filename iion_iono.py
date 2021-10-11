@@ -1,4 +1,5 @@
 
+import numpy as np
 from datetime import datetime
 from os import path
 from iono import Iono
@@ -29,13 +30,13 @@ class IionIono(Iono):
                 [[0 for x in range(self.n_freq)] for y in range(self.n_rang)]
 
             buf = file.read(file_size - header_size)
-            offset  = 0
+            offset = 0
 
             for f in range(self.n_freq):
                 for r in range(16):  # number of repeats
                     for h in range(self.n_rang):
                         z = self.n_rang - h - 1
-                        self.data[z][f] += float(buf[offset])-128.0
+                        self.data[z][f] += float(buf[offset]) ** 2  # -128.0
                         offset += 1
 
             for f in range(self.n_freq):
@@ -44,13 +45,16 @@ class IionIono(Iono):
                     if self.data[h][f] <= 0 or self.get_altitude(z) < 100.0:
                         self.data[h][f] = 0
 
-            max_val = float('-inf')
-            for f in range(self.n_freq):
-                for h in range(self.n_rang):
-                    if self.data[h][f] > max_val:
-                        max_val = self.data[h][f]
+            self.data = np.array(self.data)
 
-            self.data[0][0] = -max_val
+            n_freq = self.data.shape[1]
+            for i in range(n_freq):
+                avarage = np.average(self.data[:, i])
+                self.data[:, i] -= avarage
+
+            self.data[self.data < 0] = 0
+
+            self.data[0][0] = -np.max(self.data)
 
     def get_altitude(self, h):
         # TODO check start and step values

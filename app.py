@@ -1,3 +1,19 @@
+from shigaraki_loader import ShigarakiLoader
+from sao import Sao, \
+    PrefaceAA, PrefaceFE, \
+    GeophysicalConstants as GC, ScaledCharacteristics as SC
+from filelist import FileList
+from shigaraki_iono import ShigarakiIono
+from dps_amp_iono import DpsAmpIono
+from ips42_iono import Ips42Iono
+from iion_iono import IionIono
+from rinan_iono import RinanIono
+from karazin_iono import KarazinIono
+from iono_tester import IonoTester
+from matplotlib import colors
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg \
+    import FigureCanvasQTAgg as FigureCanvas
 import sys
 from os import path
 from datetime import datetime, timedelta
@@ -10,24 +26,7 @@ from PyQt5.Qt import QDialog
 
 import matplotlib
 matplotlib.use('agg')
-from matplotlib.backends.backend_qt5agg \
-    import FigureCanvasQTAgg as FigureCanvas
-import matplotlib.pyplot as plt
-from matplotlib import colors
 
-from iono_tester import IonoTester
-from karazin_iono import KarazinIono
-from rinan_iono import RinanIono
-from iion_iono import IionIono
-from ips42_iono import Ips42Iono
-from dps_amp_iono import DpsAmpIono
-from shigaraki_iono import ShigarakiIono
-
-from filelist import FileList
-from sao import Sao, \
-    PrefaceAA, PrefaceFE, \
-    GeophysicalConstants as GC, ScaledCharacteristics as SC
-from shigaraki_loader import ShigarakiLoader
 
 DATE_TIME_FORMAT = 'yyyy-MM-dd hh:mm'
 
@@ -38,7 +37,7 @@ class MainWindow(QMainWindow):
 
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.4'
+        self.program_name = 'IonogramViewer2 v1.5'
         self.file_name = ''
         self.iono = None
         self.ax = None
@@ -353,7 +352,7 @@ class MainWindow(QMainWindow):
             self.iono = class_()
             self.iono.load(file_name)
             data = self.iono.get_data()
-            if data:
+            if data is not None:
 
                 self.file_name = file_name
 
@@ -363,11 +362,11 @@ class MainWindow(QMainWindow):
                 cmap = colors.ListedColormap([
                     '#6E1E5A', '#782064', '#8C189A', '#9F2883',
                     '#AF4EC2', '#CA89D8', '#D9A8E1', '#FFFFFF',
-                    '#eeeeee', '#bcbcbc','#aaaaaa',
-                    '#909090', '#606060', '#353535','#000000'
-                    ])
+                    '#eeeeee', '#bcbcbc', '#aaaaaa',
+                    '#909090', '#606060', '#353535', '#000000'
+                ])
                 self.ax.imshow(data, cmap=cmap, interpolation='nearest',
-                                extent=extent, aspect='auto')
+                               extent=extent, aspect='auto')
 
                 tics = self.iono.get_freq_tics()
                 labels = self.iono.get_freq_labels()
@@ -589,7 +588,7 @@ class MainWindow(QMainWindow):
             check_ranges(self.doubleSpinBoxF1m.value()),))
 
         sao.scaled_characteristics[SC.F_MIN_E] = check_ranges(
-            self.doubleSpinBoxEm.value()) 
+            self.doubleSpinBoxEm.value())
 
         sao.scaled_characteristics[SC.F_MIN] = min((
             sao.scaled_characteristics[SC.F_MIN_F],
@@ -620,7 +619,7 @@ class MainWindow(QMainWindow):
 
         fohE = ''
         for i in range(self.listWidgetE.count()):
-                fohE += self.listWidgetE.item(i).text() + '\n'
+            fohE += self.listWidgetE.item(i).text() + '\n'
 
         foF1 = self.doubleSpinBoxF1.value()
         if abs(foF1 - 99.0) < 1.0 or abs(foF1) < 0.1:
@@ -721,7 +720,7 @@ class MainWindow(QMainWindow):
     def show_about(self):
         about = (
             '\n\n'
-            '© 2018-2019 Oleksandr Bogomaz'
+            '© 2018-2021 Oleksandr Bogomaz'
             '\n'
             'o.v.bogomaz1985@gmail.com')
 
@@ -767,6 +766,7 @@ class RemoteWnd(QDialog):
                 msg.setWindowTitle('Remote')
                 msg.show()
                 msg.exec_()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -1,4 +1,5 @@
 from math import log
+import numpy as np
 from datetime import datetime
 from configparser import ConfigParser, NoSectionError, NoOptionError
 from iono import Iono
@@ -20,7 +21,8 @@ class RinanIono(Iono):
         self.n_freq = index_end_of_header - index_freq - 1
 
         index_data = lines.index('DATA')
-        index_end_of_data = lines[index_end_of_header+1:].index('END')+index_end_of_header+1
+        index_end_of_data = lines[index_end_of_header +
+                                  1:].index('END')+index_end_of_header+1
 
         data_temp = [0] * self.n_freq
 
@@ -29,6 +31,7 @@ class RinanIono(Iono):
                 self.station_name = line.split(':')[-1].strip()
             elif line.startswith('Location'):
                 location = line.split(':')[-1].strip().split(', ')
+
                 def convert_to_decimal(coord):
                     d = float(coord[:2])
                     m = float(coord[3:5])
@@ -65,13 +68,19 @@ class RinanIono(Iono):
         self.data = \
             [[0 for x in range(self.n_freq)] for y in range(self.n_rang)]
 
-        max_val = float('-inf')
         for f in range(self.n_freq):
             for h in range(self.n_rang):
                 self.data[h][f] = data_temp[f][self.n_rang - h - 1]
-                if self.data[h][f] > max_val:
-                    max_val = self.data[h][f]
-        self.data[0][0] = -max_val
+
+        self.data = np.array(self.data)
+
+        n_freq = self.data.shape[1]
+        for i in range(n_freq):
+            avarage = np.average(self.data[:, i])
+            self.data[:, i] -= avarage
+
+        self.data[self.data < 0] = 0
+        self.data[0][0] = -np.max(self.data)
 
         self.load_sunspot()
 
@@ -107,7 +116,8 @@ class RinanIono(Iono):
     def get_freq_labels(self):
         f_min = int(self.get_extent()[0])
         f_max = int(self.get_extent()[1])
-        labels = ['{:.0f}'.format(self.coord_to_freq(float(x))) for x in range(f_min, f_max)]
+        labels = ['{:.0f}'.format(self.coord_to_freq(float(x)))
+                  for x in range(f_min, f_max)]
         labels = list(set(labels))
         return labels
 
@@ -122,7 +132,7 @@ class RinanIono(Iono):
         f2 = self.frequencies[int(coord)+1]
         df = f2 - f1
         return f1 + (coord - int(coord)) * df
-    
+
     def __find_closest_freq(self, freq):
         if freq <= self.frequencies[0]:
             return -1

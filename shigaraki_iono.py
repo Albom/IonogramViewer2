@@ -1,4 +1,5 @@
 
+import numpy as np
 from datetime import datetime
 from os import path
 from iono import Iono
@@ -40,7 +41,18 @@ class ShigarakiIono(Iono):
                 if _m > m:
                     m = _m
         self.data.reverse()
-        self.data[0][0] = -m
+        # self.data[0][0] = -m
+
+        self.data = np.array(self.data)
+
+        n_freq = self.data.shape[1]
+        for i in range(n_freq):
+            avarage = np.average(self.data[:, i])
+            self.data[:, i] -= avarage
+
+        self.data[self.data < 0] = 0
+
+        self.data[0][0] = -np.max(self.data)
 
         self.load_sunspot()
 
