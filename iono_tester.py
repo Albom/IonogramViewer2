@@ -21,13 +21,13 @@ class IonoTester:
                 'class_name': 'RinanIono',
                 'patterns': ['????????_????_iono.ion']},
             'IION': {
-                'class_name': 'IionIono',
+                'class_name': 'BazisIono',
                 'patterns': ['NF??????.??', 'B1??????.??', 'B2??????.??'],
                 'sizes': [1200021, 1600021]},
             'Shigaraki': {
                 'class_name': 'ShigarakiIono',
                 'patterns': ['????????????_ionogram.txt']}
-            }
+        }
         self.class_name = ''
         self.probability = 0
         self.points = {x: 0 for x in self.FILE_FORMATS.keys()}

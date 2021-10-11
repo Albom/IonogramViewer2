@@ -5,7 +5,7 @@ from os import path
 from iono import Iono
 
 
-class IionIono(Iono):
+class BazisIono(Iono):
 
     def __init__(self):
         super().__init__()
@@ -76,6 +76,6 @@ class IionIono(Iono):
 
 
 if __name__ == '__main__':
-    iono = IionIono()
+    iono = BazisIono()
     iono.load('./examples/iion/NF190606.50')
     print(iono.date)

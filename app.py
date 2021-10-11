@@ -6,7 +6,7 @@ from filelist import FileList
 from shigaraki_iono import ShigarakiIono
 from dps_amp_iono import DpsAmpIono
 from ips42_iono import Ips42Iono
-from iion_iono import IionIono
+from bazis_iono import BazisIono
 from rinan_iono import RinanIono
 from karazin_iono import KarazinIono
 from iono_tester import IonoTester
