@@ -13,7 +13,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>575</height>
+    <height>745</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -62,7 +62,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>633</width>
+     <width>1000</width>
      <height>21</height>
     </rect>
    </property>
@@ -98,7 +98,7 @@
    <property name="minimumSize">
     <size>
      <width>180</width>
-     <height>573</height>
+     <height>670</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -148,13 +148,26 @@
      </item>
      <item>
       <widget class="QDoubleSpinBox" name="doubleSpinBoxF2">
+       <property name="toolTip">
+        <string>foF2</string>
+       </property>
        <property name="singleStep">
         <double>0.010000000000000</double>
        </property>
       </widget>
      </item>
      <item>
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxF2x">
+       <property name="toolTip">
+        <string>fxF2</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QDoubleSpinBox" name="doubleSpinBoxF2m">
+       <property name="toolTip">
+        <string>fminF2</string>
+       </property>
        <property name="singleStep">
         <double>0.010000000000000</double>
        </property>
@@ -189,8 +202,21 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>foF1</string>
+       </property>
        <property name="singleStep">
         <double>0.010000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxF1x">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>fxF1</string>
        </property>
       </widget>
      </item>
@@ -198,6 +224,9 @@
       <widget class="QDoubleSpinBox" name="doubleSpinBoxF1m">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>fminF1</string>
        </property>
        <property name="singleStep">
         <double>0.010000000000000</double>
@@ -236,8 +265,21 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>foE</string>
+       </property>
        <property name="singleStep">
         <double>0.010000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="doubleSpinBoxEx">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>fxE</string>
        </property>
       </widget>
      </item>
@@ -245,6 +287,9 @@
       <widget class="QDoubleSpinBox" name="doubleSpinBoxEm">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>fminE</string>
        </property>
        <property name="singleStep">
         <double>0.010000000000000</double>
@@ -262,6 +307,23 @@
        </property>
        <property name="sortingEnabled">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButtonEs">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Es</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListWidget" name="listWidgetEs">
+       <property name="enabled">
+        <bool>false</bool>
        </property>
       </widget>
      </item>

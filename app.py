@@ -195,20 +195,24 @@ class MainWindow(QMainWindow):
         widgets = [
             self.doubleSpinBoxE, self.doubleSpinBoxF1, self.doubleSpinBoxF2,
             self.doubleSpinBoxEm, self.doubleSpinBoxF1m, self.doubleSpinBoxF2m,
+            self.doubleSpinBoxEx, self.doubleSpinBoxF1x, self.doubleSpinBoxF2x,
             self.listWidgetE, self.listWidgetF1, self.listWidgetF2]
         for w in widgets:
             w.setEnabled(False)
 
         if mode == 0:
             self.doubleSpinBoxF2.setEnabled(True)
+            self.doubleSpinBoxF2x.setEnabled(True)
             self.doubleSpinBoxF2m.setEnabled(True)
             self.listWidgetF2.setEnabled(True)
         elif mode == 1:
             self.doubleSpinBoxF1.setEnabled(True)
+            self.doubleSpinBoxF1x.setEnabled(True)
             self.doubleSpinBoxF1m.setEnabled(True)
             self.listWidgetF1.setEnabled(True)
         elif mode == 2:
             self.doubleSpinBoxE.setEnabled(True)
+            self.doubleSpinBoxEx.setEnabled(True)
             self.doubleSpinBoxEm.setEnabled(True)
             self.listWidgetE.setEnabled(True)
 
