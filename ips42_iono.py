@@ -206,8 +206,8 @@ class Ips42Iono(Iono):
         raise ValueError('Digit is not recognized')
 
     def get_extent(self):
-        left = 0
-        right = 22.5
+        left = self.freq_to_coord(1)
+        right = self.freq_to_coord(22.6)
         bottom = -2
         top = 796
         return [left, right, bottom, top]
@@ -216,14 +216,13 @@ class Ips42Iono(Iono):
         return [self.freq_to_coord(x) for x in self.get_freq_labels()]
 
     def get_freq_labels(self):
-        # [1, 1.4, 2, 2.8, 4, 5.6, 8, 11.4, 16, 22.4]
-        return ['{:.1f}'.format(sqrt(2) ** i) for i in range(10)]
+        return [1, 1.4, 2, 2.8, 4.0, 5.6, 8, 11.4, 16, 22.6]
 
     def freq_to_coord(self, freq):
-        return log(float(freq), sqrt(2)) * 2.5
+        return log(float(freq), 22.6)*575
 
     def coord_to_freq(self, coord):
-        return sqrt(2) ** (coord / 2.5)
+        return 22.6 ** (coord/575)
 
 
 if __name__ == '__main__':

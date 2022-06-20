@@ -103,6 +103,11 @@ class RinanIono(Iono):
         except (NoSectionError):
             pass
 
+        try:
+            self.timezone = int(config.get(str(station), 'timezone'))
+        except (NoSectionError, NoOptionError, ValueError):
+            pass
+
     def get_extent(self):
         left = self.freq_to_coord(self.frequencies[0])
         right = self.freq_to_coord(self.frequencies[-1])
