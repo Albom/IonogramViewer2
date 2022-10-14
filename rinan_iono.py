@@ -51,7 +51,7 @@ class RinanIono(Iono):
                 self.nsound = int(line.split('=')[-1].strip())
             elif line.startswith('TIME'):
                 date = line.split('=')[-1].strip()
-                if date.endswith(' UT'):
+                if date.endswith(' UT') or date.endswith(' LT'):
                     date = date[:-3]
                 self.date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
 
@@ -59,7 +59,10 @@ class RinanIono(Iono):
                 self.frequencies.append(float(line.split()[-1].strip()))
 
             if i > index_data and i < index_end_of_data:
-                row = [log(float(x), 10) for x in line.split()]
+                if file_name.endswith('.pion'):
+                    row = [float(x) for x in line.split()]
+                else:
+                    row = [log(abs(float(x))+1, 10) for x in line.split()]
                 data_temp[i - index_data - 1] = row
 
         self.n_rang = len(data_temp[0])
