@@ -724,7 +724,7 @@ class MainWindow(QMainWindow):
     def show_about(self):
         about = (
             '\n\n'
-            '© 2018-2021 Oleksandr Bogomaz'
+            '© 2018-2022 Oleksandr Bogomaz'
             '\n'
             'o.v.bogomaz1985@gmail.com')
 
