@@ -76,6 +76,9 @@
    </property>
   </widget>
   <widget class="QGroupBox" name="proxyGroupBox">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -89,6 +92,9 @@
    </property>
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
    </property>
    <widget class="QLabel" name="label">
     <property name="geometry">

@@ -1,2 +1,2 @@
-python app.py
+python IonogramViewer2.py
 pause

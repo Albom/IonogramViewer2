@@ -13,7 +13,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>745</height>
+    <height>871</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -63,7 +63,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -98,7 +98,7 @@
    <property name="minimumSize">
     <size>
      <width>180</width>
-     <height>670</height>
+     <height>784</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -157,23 +157,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBoxF2x">
-       <property name="toolTip">
-        <string>fxF2</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBoxF2m">
-       <property name="toolTip">
-        <string>fminF2</string>
-       </property>
-       <property name="singleStep">
-        <double>0.010000000000000</double>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QListWidget" name="listWidgetF2">
        <property name="enabled">
         <bool>true</bool>
@@ -204,29 +187,6 @@
        </property>
        <property name="toolTip">
         <string>foF1</string>
-       </property>
-       <property name="singleStep">
-        <double>0.010000000000000</double>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBoxF1x">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="toolTip">
-        <string>fxF1</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBoxF1m">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="toolTip">
-        <string>fminF1</string>
        </property>
        <property name="singleStep">
         <double>0.010000000000000</double>
@@ -274,29 +234,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBoxEx">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="toolTip">
-        <string>fxE</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QDoubleSpinBox" name="doubleSpinBoxEm">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="toolTip">
-        <string>fminE</string>
-       </property>
-       <property name="singleStep">
-        <double>0.010000000000000</double>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QListWidget" name="listWidgetE">
        <property name="enabled">
         <bool>false</bool>
@@ -307,23 +244,6 @@
        </property>
        <property name="sortingEnabled">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="radioButtonEs">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Es</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QListWidget" name="listWidgetEs">
-       <property name="enabled">
-        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -365,7 +285,7 @@
    <property name="minimumSize">
     <size>
      <width>220</width>
-     <height>584</height>
+     <height>633</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -474,7 +394,7 @@
           <property name="spacing">
            <number>5</number>
           </property>
-          <item row="6" column="1">
+          <item row="4" column="1">
            <widget class="QSpinBox" name="pngWidthSpinBox">
             <property name="minimum">
              <number>5</number>
@@ -487,38 +407,14 @@
             </property>
            </widget>
           </item>
-          <item row="9" column="0" colspan="2">
+          <item row="7" column="0" colspan="2">
            <widget class="QPushButton" name="pngDefaultButton">
             <property name="text">
              <string>Set default values</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="2">
-           <widget class="QCheckBox" name="sao5CheckBox">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>SAO version 5.0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Height (inches)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Width (inches)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0" colspan="2">
+          <item row="3" column="0" colspan="2">
            <widget class="QCheckBox" name="pngCheckBox">
             <property name="text">
              <string>PNG image (up to 10 x 10 inches)</string>
@@ -528,7 +424,14 @@
             </property>
            </widget>
           </item>
-          <item row="8" column="1">
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>dpi</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
            <widget class="QSpinBox" name="pngDpiSpinBox">
             <property name="minimum">
              <number>100</number>
@@ -541,27 +444,24 @@
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_7">
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="stdCheckBox">
             <property name="text">
-             <string>dpi</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QCheckBox" name="sao4CheckBox">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>SAO version 4.3</string>
+             <string>STD file</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Height (inches)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
            <widget class="QSpinBox" name="pngHeightSpinBox">
             <property name="minimum">
              <number>5</number>
@@ -574,20 +474,17 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
+          <item row="2" column="0" colspan="2">
            <widget class="Line" name="line">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="stdCheckBox">
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>STD file</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Width (inches)</string>
             </property>
            </widget>
           </item>

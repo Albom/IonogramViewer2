@@ -1,7 +1,4 @@
 from shigaraki_loader import ShigarakiLoader
-from sao import Sao, \
-    PrefaceAA, PrefaceFE, \
-    GeophysicalConstants as GC, ScaledCharacteristics as SC
 from filelist import FileList
 from shigaraki_iono import ShigarakiIono
 from dps_amp_iono import DpsAmpIono
@@ -37,7 +34,7 @@ class MainWindow(QMainWindow):
 
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.5'
+        self.program_name = 'IonogramViewer2 v1.6'
         self.file_name = ''
         self.iono = None
         self.ax = None
@@ -89,8 +86,8 @@ class MainWindow(QMainWindow):
             w.customContextMenuRequested.connect(self.delete_menu)
 
         spinBoxes = [
-            self.doubleSpinBoxF2, self.doubleSpinBoxF1, self.doubleSpinBoxE,
-            self.doubleSpinBoxF2m, self.doubleSpinBoxF1m, self.doubleSpinBoxEm]
+                     self.doubleSpinBoxF2, self.doubleSpinBoxF1, self.doubleSpinBoxE
+                    ]
         for w in spinBoxes:
             w.valueChanged.connect(self.plot_lines)
 
@@ -164,9 +161,6 @@ class MainWindow(QMainWindow):
         self.doubleSpinBoxF2.setValue(0)
         self.doubleSpinBoxF1.setValue(0)
         self.doubleSpinBoxE.setValue(0)
-        self.doubleSpinBoxF2m.setValue(0)
-        self.doubleSpinBoxF1m.setValue(0)
-        self.doubleSpinBoxEm.setValue(0)
 
         self.listWidgetE.clear()
         self.listWidgetF1.clear()
@@ -194,26 +188,18 @@ class MainWindow(QMainWindow):
 
         widgets = [
             self.doubleSpinBoxE, self.doubleSpinBoxF1, self.doubleSpinBoxF2,
-            self.doubleSpinBoxEm, self.doubleSpinBoxF1m, self.doubleSpinBoxF2m,
-            self.doubleSpinBoxEx, self.doubleSpinBoxF1x, self.doubleSpinBoxF2x,
             self.listWidgetE, self.listWidgetF1, self.listWidgetF2]
         for w in widgets:
             w.setEnabled(False)
 
         if mode == 0:
             self.doubleSpinBoxF2.setEnabled(True)
-            self.doubleSpinBoxF2x.setEnabled(True)
-            self.doubleSpinBoxF2m.setEnabled(True)
             self.listWidgetF2.setEnabled(True)
         elif mode == 1:
             self.doubleSpinBoxF1.setEnabled(True)
-            self.doubleSpinBoxF1x.setEnabled(True)
-            self.doubleSpinBoxF1m.setEnabled(True)
             self.listWidgetF1.setEnabled(True)
         elif mode == 2:
             self.doubleSpinBoxE.setEnabled(True)
-            self.doubleSpinBoxEx.setEnabled(True)
-            self.doubleSpinBoxEm.setEnabled(True)
             self.listWidgetE.setEnabled(True)
 
     def onclick(self, event):
@@ -235,13 +221,6 @@ class MainWindow(QMainWindow):
                     self.doubleSpinBoxF1.setValue(f)
                 elif self.mode == 2:  # E
                     self.doubleSpinBoxE.setValue(f)
-            elif event.button == 2:
-                if self.mode == 0:  # F2
-                    self.doubleSpinBoxF2m.setValue(f)
-                elif self.mode == 1:  # F1
-                    self.doubleSpinBoxF1m.setValue(f)
-                elif self.mode == 2:  # E
-                    self.doubleSpinBoxEm.setValue(f)
             self.plot_scatters()
 
     def plot_scatters(self):
@@ -311,12 +290,6 @@ class MainWindow(QMainWindow):
             self.doubleSpinBoxF1, self.f1_critical, 'c')
         self.e_critical = plot_line(
             self.doubleSpinBoxE, self.e_critical, 'g')
-        self.f2_min = plot_line(
-            self.doubleSpinBoxF2m, self.f2_min, 'r', style='--')
-        self.f1_min = plot_line(
-            self.doubleSpinBoxF1m, self.f1_min, 'c', style='--')
-        self.e_min = plot_line(
-            self.doubleSpinBoxEm, self.e_min, 'g', style='--')
 
         self.canvas.draw()
 
@@ -524,9 +497,6 @@ class MainWindow(QMainWindow):
     def save_file(self):
         if self.file_name:
 
-            if self.sao4CheckBox.isChecked():
-                self.save_sao4(self.file_name + '.sao')
-
             if self.stdCheckBox.isChecked():
                 self.save_std(self.file_name + '.STD')
 
@@ -541,79 +511,6 @@ class MainWindow(QMainWindow):
                     dpi=dpi)
             self.statusbar.showMessage('File is saved.')
 
-    def save_sao4(self, filename):
-        sao = Sao()
-
-        sao.data_file_index[-1] = 5  # SAO-4.3
-
-        sao.data_file_index[0] = 5
-        sao.geophysical_constants = [0.0]*sao.data_file_index[0]
-        sao.geophysical_constants[GC.GYROFREQUENCY] = float(
-            self.gyrofrequencyLineEdit.text().strip())
-        sao.geophysical_constants[GC.DIP_ANGLE] = float(
-            self.dipAngleLineEdit.text().strip())
-        sao.geophysical_constants[GC.GEOGRAPHIC_LATITUDE] = float(
-            self.latLineEdit.text().strip())
-        sao.geophysical_constants[GC.GEOGRAPHIC_LONGITUDE] = float(
-            self.longLineEdit.text().strip())
-        sao.geophysical_constants[GC.SUNSPOT_NUMBER] = float(
-            self.sunspotNumberLineEdit.text().strip())
-
-        sao.data_file_index[1] = 1
-        sao.system_description = ', '.join([
-            self.get_description(),
-            self.program_name])
-
-        sao.timestamp_and_settings = PrefaceAA(  # should be PrefaceFE(
-            datetime.strptime(self.dateTimeEdit.text(), '%Y-%m-%d %H:%M'))
-        sao.data_file_index[2] = len(str(sao.timestamp_and_settings))
-
-        NO_VAL = 9999.000
-
-        def check_ranges(val):
-            left = self.iono.get_extent()[0]
-            right = self.iono.get_extent()[1]
-            if val > left and val < right:
-                return val
-            else:
-                return NO_VAL
-
-        sao.data_file_index[3] = 49
-        sao.scaled_characteristics = [NO_VAL]*sao.data_file_index[3]
-        sao.scaled_characteristics[SC.FoF2] = check_ranges(
-            self.doubleSpinBoxF2.value())
-        sao.scaled_characteristics[SC.FoF1] = check_ranges(
-            self.doubleSpinBoxF1.value())
-        sao.scaled_characteristics[SC.FoE] = check_ranges(
-            self.doubleSpinBoxE.value())
-
-        sao.scaled_characteristics[SC.F_MIN_F] = min((
-            check_ranges(self.doubleSpinBoxF2m.value()),
-            check_ranges(self.doubleSpinBoxF1m.value()),))
-
-        sao.scaled_characteristics[SC.F_MIN_E] = check_ranges(
-            self.doubleSpinBoxEm.value())
-
-        sao.scaled_characteristics[SC.F_MIN] = min((
-            sao.scaled_characteristics[SC.F_MIN_F],
-            sao.scaled_characteristics[SC.F_MIN_E]))
-
-        nF2 = self.listWidgetF2.count()
-        if nF2:
-            fohF2 = []
-            for i in range(nF2):
-                fohF2.append(
-                    [float(x) for x in self.listWidgetF2.item(i).text().split()])
-
-            sao.data_file_index[6] = nF2
-            sao.data_file_index[10] = nF2
-            sao.f2_o_heights_virtual = [0.0]*nF2
-            sao.f2_o_frequencies = [0.0]*nF2
-            for i, p in enumerate(fohF2):
-                sao.f2_o_heights_virtual[i] = p[-1]
-                sao.f2_o_frequencies[i] = p[0]
-
-        sao.write(filename)
 
     def save_std(self, filename):
 
@@ -723,14 +620,21 @@ class MainWindow(QMainWindow):
 
     def show_about(self):
         about = (
-            '\n\n'
-            '© 2018-2022 Oleksandr Bogomaz'
-            '\n'
-            'o.v.bogomaz1985@gmail.com')
+                 f'''<b>{self.program_name}</b>
+                     <br><br>
+                     Source code on GitHub:<br>
+                     <a href="https://github.com/Albom/IonogramViewer2">https://github.com/Albom/IonogramViewer2</a><br>
+                     <br>
+                     <br>
+                     © 2018-2022 Oleksandr Bogomaz<br>
+                     o.v.bogomaz1985@gmail.com<br>
+                 '''
+                )
 
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
-        msg.setText(self.program_name + about)
+        msg.setTextFormat(Qt.RichText)
+        msg.setText(about)
         msg.setWindowTitle('About')
         msg.show()
         msg.exec_()

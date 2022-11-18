@@ -2,3 +2,5 @@ __pycache__/
 .vscode/
 .project
 .pydevproject
+IonogramViewer2.build/
+IonogramViewer2.dist/
