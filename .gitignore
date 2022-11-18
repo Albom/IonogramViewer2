@@ -4,3 +4,4 @@ __pycache__/
 .pydevproject
 IonogramViewer2.build/
 IonogramViewer2.dist/
+IonogramViewer2/
