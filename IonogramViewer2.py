@@ -6,6 +6,7 @@ from ips42_iono import Ips42Iono
 from bazis_iono import BazisIono
 from rinan_iono import RinanIono
 from karazin_iono import KarazinIono
+from visrc2t_iono import Visrc2tIono
 from iono_tester import IonoTester
 from matplotlib import colors
 import matplotlib.pyplot as plt
@@ -34,7 +35,7 @@ class MainWindow(QMainWindow):
 
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.6'
+        self.program_name = 'IonogramViewer2 v1.6.1'
         self.file_name = ''
         self.iono = None
         self.ax = None
@@ -626,7 +627,7 @@ class MainWindow(QMainWindow):
                      <a href="https://github.com/Albom/IonogramViewer2">https://github.com/Albom/IonogramViewer2</a><br>
                      <br>
                      <br>
-                     © 2018-2022 Oleksandr Bogomaz<br>
+                     © 2018-2023 Oleksandr Bogomaz<br>
                      o.v.bogomaz1985@gmail.com<br>
                  '''
                 )
