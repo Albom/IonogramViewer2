@@ -1,8 +1,10 @@
 import numpy as np
+from scipy import signal
 from datetime import datetime
 from struct import unpack
 import bz2
 from iono import Iono
+
 
 class Visrc2tIono(Iono):
 
@@ -12,7 +14,7 @@ class Visrc2tIono(Iono):
         self.ionosonde_model = 'VISRC2-t'
         self.lat = 49.6766
         self.lon = 36.2952
-        self.gyro = 1.2
+        self.gyro = 1.3
         self.dip = 66.7
         self.debug_level = debug_level
 
@@ -76,12 +78,62 @@ class Visrc2tIono(Iono):
         cc_length = int(bittime * len(code) / dt)
         cc = [complex(0, code[int(dt*t/bittime)])
             for t in range(cc_length)]
-        n_height_new = len(np.convolve(
+        n_height_new = len(signal.convolve(
             np.zeros(self.n_height), cc, mode='valid'))
         return cc, n_height_new
 
+
     def load(self, file_name):
 
+        if file_name.endswith('rad.bz2') or file_name.endswith('rad'):
+            self.__make_iono_from_raw(file_name)
+        elif file_name.endswith('ig.bz2') or file_name.endswith('ig'):
+            self.__load_ionogram(file_name)
+
+        self.load_sunspot()
+
+
+    def __load_ionogram(self, file_name):
+        open_proc = bz2.open if file_name.endswith('.bz2') else open
+        with open_proc(file_name, 'rt') as file:
+            header = [s.replace('#', '').strip()  for s in file.readlines() if s.startswith('#')]
+
+        parameters = dict()
+        for line in header:
+            if ':' in line:
+                key = line.split(':')[0].strip()
+                value = line.split(':')[1].strip()
+                parameters[key] = value
+        # print(parameters)
+        self.date = datetime.fromisoformat(parameters['datetime'])
+        self.frequencies = [float(f) for f in parameters['freqs'].split()]
+        self.ranges = [float(h) for h in parameters['heights'].split()]
+        self.n_freq = float(parameters['n_freq'])
+        #self.n_height = float(parameters['n_height'])
+
+        self.data = np.loadtxt(file_name)
+
+        min_h_index = 0
+        for r in self.ranges:
+            if r > 100:
+                break
+            min_h_index += 1
+
+        self.ranges = self.ranges[min_h_index:]
+        self.n_height = len(self.ranges)
+
+        # print(np.min(self.data))
+        # print(np.max(self.data))
+
+        self.data = np.delete(self.data, [h for h in range(min_h_index)], axis=0)
+        self.data[0][0] = 2*np.min(self.data)
+        self.data[-1][-1] = np.max(self.data)
+
+        self.data = np.flip(self.data, 0)
+
+
+    def __make_iono_from_raw(self, file_name):
+        
         raw_data = self.__read_raw_data(file_name)
 
         frequencies_hz = list(set([d['freq'] for d in raw_data]))
@@ -119,8 +171,8 @@ class Visrc2tIono(Iono):
             if Is.shape != (self.n_freq, n_height_new):
                 Is.resize((self.n_freq, n_height_new))
 
-            sa = np.convolve(d['sa'], code_complementary, mode='valid')
-            sb = np.convolve(d['sb'], code_complementary, mode='valid')
+            sa = signal.convolve(d['sa'], code_complementary, mode='valid')
+            sb = signal.convolve(d['sb'], code_complementary, mode='valid')
 
             pos = frequencies_hz.index(d['freq'])
             amplitudes_a[pos] += np.array(sa)
@@ -148,8 +200,6 @@ class Visrc2tIono(Iono):
 
         self.data[0][0] = np.min(IIs)
         self.data[-1][-1] = np.max(IIs)
-
-        self.load_sunspot()
 
 
     def get_extent(self):
@@ -198,4 +248,5 @@ class Visrc2tIono(Iono):
 
 if __name__ == '__main__':
     iono = Visrc2tIono(debug_level=1)
-    iono.load('./examples/visrc2t/20211222234500.rad.bz2')
+    # iono.load('./examples/visrc2t/20211222234500.rad.bz2')
+    iono.load('./examples/visrc2t/20230605141000.ig.bz2')

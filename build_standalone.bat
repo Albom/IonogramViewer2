@@ -1,4 +1,4 @@
-python -m nuitka --standalone --follow-imports --disable-console --enable-plugin=numpy --enable-plugin=pyqt5 --assume-yes-for-downloads IonogramViewer2.py
+python -m nuitka --standalone --follow-imports --nofollow-import-to=tkinter --disable-console --enable-plugin=pyqt5 --assume-yes-for-downloads IonogramViewer2.py
 rmdir /q /s IonogramViewer2.build
 ren IonogramViewer2.dist IonogramViewer2
 xcopy ui IonogramViewer2\ui /e /i /h

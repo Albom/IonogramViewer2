@@ -208,18 +208,30 @@ class MainWindow(QMainWindow):
             f = round(self.iono.coord_to_freq(event.xdata), 2)
             h = event.ydata
             s = '{:5.2f} {:5.1f}'.format(f, h)
+
             if event.button == 1:
+
                 if self.mode == 0:  # F2
                     self.listWidgetF2.addItem(s)
                 elif self.mode == 1:  # F1
                     self.listWidgetF1.addItem(s)
                 elif self.mode == 2:  # E
                     self.listWidgetE.addItem(s)
+
             elif event.button == 3:
+
                 if self.mode == 0:  # F2
+
+                    modifiers = QApplication.keyboardModifiers()
+                    # subract half of hyrofrequency if Shift key is pressed
+                    if modifiers == Qt.ShiftModifier:
+                        f = round(self.iono.coord_to_freq(event.xdata) - self.get_value(self.gyrofrequencyLineEdit)/2, 2)
+
                     self.doubleSpinBoxF2.setValue(f)
+
                 elif self.mode == 1:  # F1
                     self.doubleSpinBoxF1.setValue(f)
+
                 elif self.mode == 2:  # E
                     self.doubleSpinBoxE.setValue(f)
             self.plot_scatters()
@@ -513,6 +525,14 @@ class MainWindow(QMainWindow):
             self.statusbar.showMessage('File is saved.')
 
 
+    def get_value(self, widget):
+        value = 0
+        try:
+            value = float(widget.text().strip())
+        except ValueError:
+            pass
+        return value
+
     def save_std(self, filename):
 
         foE = self.doubleSpinBoxE.value()
@@ -539,19 +559,11 @@ class MainWindow(QMainWindow):
         for i in range(self.listWidgetF2.count()):
             fohF2 += self.listWidgetF2.item(i).text() + '\n'
 
-        def get_value(widget):
-            value = 0
-            try:
-                value = float(widget.text().strip())
-            except ValueError:
-                pass
-            return value
-
-        self.iono.lat = get_value(self.latLineEdit)
-        self.iono.lon = get_value(self.longLineEdit)
-        self.iono.gyro = get_value(self.gyrofrequencyLineEdit)
-        self.iono.dip = get_value(self.dipAngleLineEdit)
-        self.iono.sunspot = get_value(self.sunspotNumberLineEdit)
+        self.iono.lat = self.get_value(self.latLineEdit)
+        self.iono.lon = self.get_value(self.longLineEdit)
+        self.iono.gyro = self.get_value(self.gyrofrequencyLineEdit)
+        self.iono.dip = self.get_value(self.dipAngleLineEdit)
+        self.iono.sunspot = self.get_value(self.sunspotNumberLineEdit)
 
         coordinates = str.format(
             '{} {} {} {} {}',
