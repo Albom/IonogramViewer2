@@ -104,12 +104,11 @@ class Visrc2tIono(Iono):
                 key = line.split(':')[0].strip()
                 value = line.split(':')[1].strip()
                 parameters[key] = value
-        # print(parameters)
+
         self.date = datetime.fromisoformat(parameters['datetime'])
         self.frequencies = [float(f) for f in parameters['freqs'].split()]
         self.ranges = [float(h) for h in parameters['heights'].split()]
         self.n_freq = float(parameters['n_freq'])
-        #self.n_height = float(parameters['n_height'])
 
         self.data = np.loadtxt(file_name)
 
@@ -122,12 +121,15 @@ class Visrc2tIono(Iono):
         self.ranges = self.ranges[min_h_index:]
         self.n_height = len(self.ranges)
 
-        # print(np.min(self.data))
-        # print(np.max(self.data))
-
         self.data = np.delete(self.data, [h for h in range(min_h_index)], axis=0)
-        self.data[0][0] = 2*np.min(self.data)
-        self.data[-1][-1] = np.max(self.data)
+
+        min_val = np.min(self.data)
+        max_val = np.max(self.data)
+
+        max_abs = max(abs(min_val), abs(max_val))
+
+        self.data[0][0] = -max_abs
+        self.data[-1][-1] = max_abs
 
         self.data = np.flip(self.data, 0)
 
