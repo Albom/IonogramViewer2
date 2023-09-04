@@ -60,3 +60,6 @@ class Iono:
     def load_sunspot(self):
         date = self.date + timedelta(hours=-self.timezone)
         self.sunspot = Sunspots.get(date)
+
+    def clean_ionogram(self):
+        pass

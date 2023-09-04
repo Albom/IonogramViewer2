@@ -1,13 +1,4 @@
-from shigaraki_loader import ShigarakiLoader
-from filelist import FileList
-from shigaraki_iono import ShigarakiIono
-from dps_amp_iono import DpsAmpIono
-from ips42_iono import Ips42Iono
-from bazis_iono import BazisIono
-from rinan_iono import RinanIono
-from karazin_iono import KarazinIono
-from visrc2t_iono import Visrc2tIono
-from iono_tester import IonoTester
+
 from matplotlib import colors
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg \
@@ -22,8 +13,33 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, \
     QFileDialog, QMenu, QMessageBox
 from PyQt5.Qt import QDialog
 
+import numpy as np
+import re
+
 import matplotlib
 matplotlib.use('agg')
+
+import_error = None
+
+try:
+    from visrc2t_iono import Visrc2tIono
+    from shigaraki_loader import ShigarakiLoader
+    from filelist import FileList
+    from shigaraki_iono import ShigarakiIono
+    from dps_amp_iono import DpsAmpIono
+    from ips42_iono import Ips42Iono
+    from bazis_iono import BazisIono
+    from rinan_iono import RinanIono
+    from karazin_iono import KarazinIono
+    from iono_tester import IonoTester
+except ModuleNotFoundError as e:
+    quoted = re.compile('"[^"]*"')
+    r = quoted.findall(str(e).replace("'", '"'))
+    if r:
+        if r[0].replace('"','') == 'cv2':
+            import_error = 'OpenCV is not installed.\n\nYou can install it by:\npip install opencv-python'
+        else:
+            import_error = str(e)
 
 
 DATE_TIME_FORMAT = 'yyyy-MM-dd hh:mm'
@@ -35,7 +51,7 @@ class MainWindow(QMainWindow):
 
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.6.1'
+        self.program_name = 'IonogramViewer2 v1.6.2'
         self.file_name = ''
         self.iono = None
         self.ax = None
@@ -48,6 +64,8 @@ class MainWindow(QMainWindow):
         self.f2_min = None
         self.f1_min = None
         self.e_min = None
+
+        self.im_iono = None
 
         uic.loadUi('./ui/MainWnd.ui', self)
 
@@ -62,7 +80,9 @@ class MainWindow(QMainWindow):
             self.actionLast: self.open_last_file,
             self.actionReload: self.reopen_file,
             self.actionChangeLayer: self.change_layer,
-            self.actionClose: self.close_file}
+            self.actionClose: self.close_file,
+            self.actionClean: self.clean_ionogram
+            }
         for key, action in actions.items():
             key.triggered.connect(action)
 
@@ -115,9 +135,27 @@ class MainWindow(QMainWindow):
 
         self.showMaximized()
 
+        if import_error is not None:
+            self.show_error(import_error)
+            exit(0)
+
+
+    def clean_ionogram(self):
+
+        if self.iono:
+            self.iono.clean_ionogram()
+
+            self.im_iono.set_data(self.iono.get_data())
+
+            self.im_iono.set_clim(vmin=np.min(self.iono.get_data()), \
+                                vmax=np.max(self.iono.get_data()))
+            self.figure.canvas.draw()
+
+
     def remote(self):
         wnd = RemoteWnd()
         wnd.exec_()
+
 
     def png_state_changed(self, state):
         s = state == Qt.Checked
@@ -127,10 +165,12 @@ class MainWindow(QMainWindow):
         for e in elements:
             e.setEnabled(s)
 
+
     def set_default_image_param(self):
         self.pngDpiSpinBox.setValue(100)
         self.pngWidthSpinBox.setValue(10)
         self.pngHeightSpinBox.setValue(6)
+
 
     def change_layer(self):
         mode = self.mode+1 if self.mode < 2 else 0
@@ -140,6 +180,7 @@ class MainWindow(QMainWindow):
             self.radioButtonF1.setChecked(True)
         elif mode == 2:
             self.radioButtonE.setChecked(True)
+
 
     def clear_all(self):
         self.e_scatter = None
@@ -170,6 +211,7 @@ class MainWindow(QMainWindow):
         self.radioButtonF2.setChecked(True)
         _ = [e.setEnabled(False) for e in self.properties_of_iono]
 
+
     def delete_menu(self, point):
         if self.sender().count():
             listMenu = QMenu()
@@ -183,6 +225,7 @@ class MainWindow(QMainWindow):
             elif r is delete_all_action:
                 self.sender().clear()
             self.plot_scatters()
+
 
     def change_mode(self, mode):
         self.mode = mode
@@ -202,6 +245,7 @@ class MainWindow(QMainWindow):
         elif mode == 2:
             self.doubleSpinBoxE.setEnabled(True)
             self.listWidgetE.setEnabled(True)
+
 
     def onclick(self, event):
         if event.ydata and event.xdata:
@@ -235,6 +279,7 @@ class MainWindow(QMainWindow):
                 elif self.mode == 2:  # E
                     self.doubleSpinBoxE.setValue(f)
             self.plot_scatters()
+
 
     def plot_scatters(self):
         if self.e_scatter is not None:
@@ -272,6 +317,7 @@ class MainWindow(QMainWindow):
 
         self.canvas.draw()
 
+
     def plot_lines(self, text):
 
         if self.iono is None:
@@ -306,6 +352,7 @@ class MainWindow(QMainWindow):
 
         self.canvas.draw()
 
+
     def onmove(self, event):
         if event.ydata and event.xdata:
             f = self.iono.coord_to_freq(event.xdata)
@@ -320,10 +367,12 @@ class MainWindow(QMainWindow):
                 QApplication.restoreOverrideCursor()
                 self.is_cross = False
 
+
     def open_file_dialog(self):
         file_name, _ = QFileDialog.getOpenFileName(self)
         if file_name:
             self.open_file(file_name)
+
 
     def close_file(self):
         self.clear_all()
@@ -332,6 +381,7 @@ class MainWindow(QMainWindow):
         self.figure.clear()
         self.ax = None
         self.canvas.draw()
+
 
     def open_file(self, file_name):
         tester = IonoTester()
@@ -355,7 +405,7 @@ class MainWindow(QMainWindow):
                     '#eeeeee', '#bcbcbc', '#aaaaaa',
                     '#909090', '#606060', '#353535', '#000000'
                 ])
-                self.ax.imshow(data, cmap=cmap, interpolation='nearest',
+                self.im_iono = self.ax.imshow(data, cmap=cmap, interpolation='nearest',
                                extent=extent, aspect='auto')
 
                 tics = self.iono.get_freq_tics()
@@ -390,6 +440,7 @@ class MainWindow(QMainWindow):
         else:
             self.show_error('File format is not supported.')
 
+
     def open_next_file(self):
         if self.file_name:
             directory = path.dirname(self.file_name)
@@ -398,6 +449,7 @@ class MainWindow(QMainWindow):
             if index + 1 < len(filenames):
                 new_file_name = path.join(directory, filenames[index + 1])
                 self.open_file(new_file_name)
+
 
     def open_prev_file(self):
         if self.file_name:
@@ -408,12 +460,14 @@ class MainWindow(QMainWindow):
                 new_file_name = path.join(directory, filenames[index - 1])
                 self.open_file(new_file_name)
 
+
     def open_last_file(self):
         if self.file_name:
             directory = path.dirname(self.file_name)
             filenames = self.get_filelist(directory)
             new_file_name = path.join(directory, filenames[-1])
             self.open_file(new_file_name)
+
 
     def open_first_file(self):
         if self.file_name:
@@ -422,9 +476,11 @@ class MainWindow(QMainWindow):
             new_file_name = path.join(directory, filenames[0])
             self.open_file(new_file_name)
 
+
     def reopen_file(self):
         if self.file_name:
             self.open_file(self.file_name)
+
 
     def get_filelist(self, directory):
         tester = IonoTester()
@@ -434,6 +490,7 @@ class MainWindow(QMainWindow):
             if class_name != 'Unknown':
                 result.append(filename)
         return result
+
 
     def load_text_info(self):
         try:
@@ -507,6 +564,7 @@ class MainWindow(QMainWindow):
         except IOError:
             return
 
+
     def save_file(self):
         if self.file_name:
 
@@ -532,6 +590,7 @@ class MainWindow(QMainWindow):
         except ValueError:
             pass
         return value
+
 
     def save_std(self, filename):
 
@@ -599,6 +658,7 @@ class MainWindow(QMainWindow):
             file.write(str(fohF2))
             file.write('END\n')
 
+
     def save_image(self, filename, **kwargs):
         width = 10 if 'width' not in kwargs else kwargs['width']
         height = 6 if 'height' not in kwargs else kwargs['height']
@@ -613,6 +673,7 @@ class MainWindow(QMainWindow):
         plt.tight_layout()
         self.canvas.draw()
 
+
     def get_description(self):
         ursi_code = self.ursiCodeEdit.text().strip()
         time_zone = self.timeZoneComboBox.currentText().strip()
@@ -623,6 +684,7 @@ class MainWindow(QMainWindow):
             'UTC' if time_zone == '0' else 'UTC'+time_zone)
         return description
 
+
     def show_error(self, message):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
@@ -630,6 +692,7 @@ class MainWindow(QMainWindow):
         msg.setWindowTitle('Error')
         msg.show()
         msg.exec_()
+
 
     def show_about(self):
         about = (
@@ -653,6 +716,7 @@ class MainWindow(QMainWindow):
         msg.exec_()
 
 
+
 class RemoteWnd(QDialog):
 
     def __init__(self):
@@ -665,6 +729,7 @@ class RemoteWnd(QDialog):
         self.startDateTimeEdit.setDisplayFormat(DATE_TIME_FORMAT)
         self.endDateTimeEdit.setDisplayFormat(DATE_TIME_FORMAT)
         self.show()
+
 
     def import_button_clicked(self):
         directory_name = str(QFileDialog.getExistingDirectory(self))

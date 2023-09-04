@@ -3,10 +3,12 @@ from scipy import signal
 from datetime import datetime
 from struct import unpack
 import bz2
+import cv2
 from iono import Iono
 
 
 class Visrc2tIono(Iono):
+
 
     def __init__(self, debug_level=0):
         super().__init__()
@@ -14,9 +16,10 @@ class Visrc2tIono(Iono):
         self.ionosonde_model = 'VISRC2-t'
         self.lat = 49.6766
         self.lon = 36.2952
-        self.gyro = 1.3
+        self.gyro = 1.4
         self.dip = 66.7
         self.debug_level = debug_level
+
 
     def __read_raw_data(self, file_name):
         open_proc = bz2.open if file_name.endswith('.bz2') else open
@@ -72,6 +75,7 @@ class Visrc2tIono(Iono):
                      'sa': sa, 'sb': sb})
             return raw_data
 
+
     def __calc_code_complementary(self, code, bittime):
         dt = 1 / self.rx_rate
         code = list(reversed(code))
@@ -123,6 +127,8 @@ class Visrc2tIono(Iono):
 
         self.data = np.delete(self.data, [h for h in range(min_h_index)], axis=0)
 
+        self.data = np.flip(self.data, 0)
+
         min_val = np.min(self.data)
         max_val = np.max(self.data)
 
@@ -130,8 +136,6 @@ class Visrc2tIono(Iono):
 
         self.data[0][0] = -max_abs
         self.data[-1][-1] = max_abs
-
-        self.data = np.flip(self.data, 0)
 
 
     def __make_iono_from_raw(self, file_name):
@@ -246,6 +250,25 @@ class Visrc2tIono(Iono):
             if f - freq >= 0:
                 return i-1
         return len(self.frequencies)-2
+
+
+    def clean_ionogram(self):
+        sign_vals = np.sign(self.data)
+        abs_vals = np.fabs(self.data)
+        abs_vals /= np.max(abs_vals)
+        abs_vals *= 255
+
+        abs_vals = cv2.fastNlMeansDenoising(abs_vals.astype('uint8'),None,7,7,7)
+
+        self.data = abs_vals * sign_vals
+
+        min_val = np.min(self.data)
+        max_val = np.max(self.data)
+
+        max_abs = max(abs(min_val), abs(max_val))
+
+        self.data[0][0] = -max_abs
+        self.data[-1][-1] = max_abs
 
 
 if __name__ == '__main__':
