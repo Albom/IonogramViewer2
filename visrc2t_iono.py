@@ -104,12 +104,14 @@ class Visrc2tIono(Iono):
 
         parameters = dict()
         for line in header:
-            if ':' in line:
+            if line.startswith('datetime: '):
+                d = line[line.index(':')+2:]
+                self.date = datetime.fromisoformat(d)
+            elif ':' in line:
                 key = line.split(':')[0].strip()
                 value = line.split(':')[1].strip()
                 parameters[key] = value
 
-        self.date = datetime.fromisoformat(parameters['datetime'])
         self.frequencies = [float(f) for f in parameters['freqs'].split()]
         self.ranges = [float(h) for h in parameters['heights'].split()]
         self.n_freq = float(parameters['n_freq'])
