@@ -52,7 +52,7 @@ class ShigarakiIono(Iono):
 
         self.data[self.data < 0] = 0
 
-        self.data[0][0] = -np.max(self.data)
+        # self.data[0][0] = -np.max(self.data)
 
         self.load_sunspot()
 

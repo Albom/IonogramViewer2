@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
 
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.6.2'
+        self.program_name = 'IonogramViewer2 v1.6.3pre'
         self.file_name = ''
         self.iono = None
         self.ax = None
@@ -399,13 +399,13 @@ class MainWindow(QMainWindow):
                 self.ax = self.figure.add_subplot(111)
 
                 extent = self.iono.get_extent()
-                cmap = colors.ListedColormap([
-                    '#6E1E5A', '#782064', '#8C189A', '#9F2883',
-                    '#AF4EC2', '#CA89D8', '#D9A8E1', '#FFFFFF',
-                    '#eeeeee', '#bcbcbc', '#aaaaaa',
-                    '#909090', '#606060', '#353535', '#000000'
-                ])
-                self.im_iono = self.ax.imshow(data, cmap=cmap, interpolation='nearest',
+                # cmap = colors.ListedColormap([
+                #     '#6E1E5A', '#782064', '#8C189A', '#9F2883',
+                #     '#AF4EC2', '#CA89D8', '#D9A8E1', '#FFFFFF',
+                #     '#eeeeee', '#bcbcbc', '#aaaaaa',
+                #     '#909090', '#606060', '#353535', '#000000'
+                # ])
+                self.im_iono = self.ax.imshow(data, cmap=self.iono.cmap, interpolation='nearest',
                                extent=extent, aspect='auto')
 
                 tics = self.iono.get_freq_tics()

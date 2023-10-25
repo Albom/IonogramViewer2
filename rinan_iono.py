@@ -14,6 +14,9 @@ class RinanIono(Iono):
         with open(file_name) as file:
             lines = [s.strip() for s in file.readlines()]
 
+        if file_name.lower().endswith('.pion'):
+            self.cmap = 'seismic'
+
         index_freq = lines.index('Frequency Set')
         index_end_of_header = lines.index('END')
 
@@ -59,8 +62,8 @@ class RinanIono(Iono):
                 self.frequencies.append(float(line.split()[-1].strip()))
 
             if i > index_data and i < index_end_of_data:
-                if file_name.endswith('.pion'):
-                    row = [float(x) for x in line.split()]
+                if file_name.lower().endswith('.pion'):
+                    row = [-99999 if 49999<=float(x)<=50000 else float(x) for x in line.split()]
                 else:
                     row = [log(abs(float(x))+1, 10) for x in line.split()]
                 data_temp[i - index_data - 1] = row
@@ -78,12 +81,14 @@ class RinanIono(Iono):
         self.data = np.array(self.data)
 
         n_freq = self.data.shape[1]
-        for i in range(n_freq):
-            avarage = np.average(self.data[:, i])
-            self.data[:, i] -= avarage
 
-        self.data[self.data < 0] = 0
-        self.data[0][0] = -np.max(self.data)
+        if not file_name.lower().endswith('.pion'):
+            for i in range(n_freq):
+                avarage = np.average(self.data[:, i])
+                self.data[:, i] -= avarage
+
+            self.data[self.data < 0] = 0
+        # self.data[0][0] = -np.max(self.data)
 
         self.load_sunspot()
 

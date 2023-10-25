@@ -19,6 +19,7 @@ class Visrc2tIono(Iono):
         self.gyro = 1.4
         self.dip = 66.7
         self.debug_level = debug_level
+        self.cmap = 'seismic'
 
 
     def __read_raw_data(self, file_name):

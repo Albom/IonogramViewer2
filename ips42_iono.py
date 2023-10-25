@@ -28,7 +28,7 @@ class Ips42Iono(Iono):
                     bit = (data_tuple[i] >> z) & 1
                     self.data[alt][f] = 0 if bit else 1
 
-        self.data[0][0] = -1
+        # self.data[0][0] = -1
 
         self._extract_info()
         if self.date:

@@ -1,4 +1,5 @@
 from datetime import datetime
+from math import sin
 from iono import Iono
 
 
@@ -7,6 +8,7 @@ class DpsAmpIono(Iono):
     def __init__(self):
         super().__init__()
         self.ursi_code = None
+        self.cmap = 'seismic'
 
     def load(self, file_name):
 
@@ -50,7 +52,7 @@ class DpsAmpIono(Iono):
             i_rang = self.ranges.index(rang)
 
             if az == 0 and zn == 0:
-                self.data[self.n_rang-i_rang-1][i_freq] = float(amp)*pol/90.0
+                self.data[self.n_rang-i_rang-1][i_freq] = float(amp)*sin(pol)
 
         self.load_sunspot()
 

@@ -71,7 +71,7 @@ class KarazinIono(Iono):
                 self.data[h][f] = data_temp[f][self.n_rang - h - 1]
                 if self.data[h][f] > max_val:
                     max_val = self.data[h][f]
-        self.data[0][0] = -max_val
+        # self.data[0][0] = -max_val
 
     def get_extent(self):
         left = self.freq_to_coord(self.frequencies[0])

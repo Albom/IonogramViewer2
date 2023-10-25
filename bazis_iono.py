@@ -54,7 +54,7 @@ class BazisIono(Iono):
 
             self.data[self.data < 0] = 0
 
-            self.data[0][0] = -np.max(self.data)
+            # self.data[0][0] = -np.max(self.data)
 
     def get_altitude(self, h):
         # TODO check start and step values

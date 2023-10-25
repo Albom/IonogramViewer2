@@ -17,6 +17,7 @@ class Iono:
         self.dip = 0
         self.sunspot = -1
         self.debug_level = debug_level
+        self.cmap = 'binary'
 
     def get_data(self):
         return self.data
