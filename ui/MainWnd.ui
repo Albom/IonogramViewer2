@@ -270,6 +270,8 @@
    <addaction name="actionNext"/>
    <addaction name="actionLast"/>
    <addaction name="separator"/>
+   <addaction name="actionMoveLeft"/>
+   <addaction name="actionMoveRight"/>
    <addaction name="actionClean"/>
    <addaction name="separator"/>
    <addaction name="actionHelp"/>
@@ -891,6 +893,33 @@ number</string>
    </property>
    <property name="toolTip">
     <string>Clean ionogram</string>
+   </property>
+  </action>
+  <action name="actionMoveLeft">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/icons8-open-pane-24.png</normaloff>images/icons8-open-pane-24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move left</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionMoveRight">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/icons8-close-pane-24.png</normaloff>images/icons8-close-pane-24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move right</string>
+   </property>
+   <property name="toolTip">
+    <string>Move right</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>

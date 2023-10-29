@@ -140,6 +140,10 @@ class Visrc2tIono(Iono):
         self.data[0][0] = -max_abs
         self.data[-1][-1] = max_abs
 
+        # hist = np.histogram(self.data, bins=50)
+        # np.savetxt('out_y.txt', hist[0])
+        # np.savetxt('out_x.txt', hist[1])
+
 
     def __make_iono_from_raw(self, file_name):
         

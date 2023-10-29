@@ -81,7 +81,9 @@ class MainWindow(QMainWindow):
             self.actionReload: self.reopen_file,
             self.actionChangeLayer: self.change_layer,
             self.actionClose: self.close_file,
-            self.actionClean: self.clean_ionogram
+            self.actionClean: self.clean_ionogram,
+            self.actionMoveLeft: self.move_left,
+            self.actionMoveRight: self.move_right
             }
         for key, action in actions.items():
             key.triggered.connect(action)
@@ -138,6 +140,48 @@ class MainWindow(QMainWindow):
         if import_error is not None:
             self.show_error(import_error)
             exit(0)
+
+
+    def move_left(self):
+
+        if self.iono:
+            gyro_2 = self.get_value(self.gyrofrequencyLineEdit)/2
+
+            if self.mode == 0:  # F2
+                f = self.doubleSpinBoxF2.value() - gyro_2
+                if f >= self.iono.coord_to_freq(self.iono.get_extent()[0]):
+                    self.doubleSpinBoxF2.setValue(f)
+
+            elif self.mode == 1:  # F1
+                f = self.doubleSpinBoxF1.value() - gyro_2
+                if f >= self.iono.coord_to_freq(self.iono.get_extent()[0]):
+                    self.doubleSpinBoxF1.setValue(f)
+
+            elif self.mode == 2:  # E
+                f = self.doubleSpinBoxE.value() - gyro_2
+                if f >= self.iono.coord_to_freq(self.iono.get_extent()[0]):
+                    self.doubleSpinBoxE.setValue(f)
+
+
+    def move_right(self):
+
+        if self.iono:
+            gyro_2 = self.get_value(self.gyrofrequencyLineEdit)/2
+
+            if self.mode == 0:  # F2
+                f = self.doubleSpinBoxF2.value() + gyro_2
+                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]):
+                    self.doubleSpinBoxF2.setValue(f)
+
+            elif self.mode == 1:  # F1
+                f = self.doubleSpinBoxF1.value() + gyro_2
+                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]):
+                    self.doubleSpinBoxF1.setValue(f)
+
+            elif self.mode == 2:  # E
+                f = self.doubleSpinBoxE.value() + gyro_2
+                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]):
+                    self.doubleSpinBoxE.setValue(f)
 
 
     def clean_ionogram(self):
