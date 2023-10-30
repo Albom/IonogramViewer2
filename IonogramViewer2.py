@@ -170,17 +170,17 @@ class MainWindow(QMainWindow):
 
             if self.mode == 0:  # F2
                 f = self.doubleSpinBoxF2.value() + gyro_2
-                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]):
+                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]-1):
                     self.doubleSpinBoxF2.setValue(f)
 
             elif self.mode == 1:  # F1
                 f = self.doubleSpinBoxF1.value() + gyro_2
-                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]):
+                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1])-1:
                     self.doubleSpinBoxF1.setValue(f)
 
             elif self.mode == 2:  # E
                 f = self.doubleSpinBoxE.value() + gyro_2
-                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]):
+                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]-1):
                     self.doubleSpinBoxE.setValue(f)
 
 
