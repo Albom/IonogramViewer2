@@ -32,6 +32,7 @@ try:
     from rinan_iono import RinanIono
     from karazin_iono import KarazinIono
     from iono_tester import IonoTester
+    from colormaps import cmap_two_comp
 except ModuleNotFoundError as e:
     quoted = re.compile('"[^"]*"')
     r = quoted.findall(str(e).replace("'", '"'))
@@ -51,7 +52,7 @@ class MainWindow(QMainWindow):
 
         super().__init__()
 
-        self.program_name = 'IonogramViewer2 v1.6.3pre'
+        self.program_name = 'IonogramViewer2 v1.6.3'
         self.file_name = ''
         self.iono = None
         self.ax = None
@@ -66,6 +67,10 @@ class MainWindow(QMainWindow):
         self.e_min = None
 
         self.im_iono = None
+
+        self.F2_COLOR = '#f51020'
+        self.F1_COLOR = '#10f0f0'
+        self.E_COLOR = '#10c020'
 
         uic.loadUi('./ui/MainWnd.ui', self)
 
@@ -114,6 +119,10 @@ class MainWindow(QMainWindow):
         for w in spinBoxes:
             w.valueChanged.connect(self.plot_lines)
 
+        clear_buttons = [self.buttonClearF2, self.buttonClearF1, self.buttonClearE]
+        for b in clear_buttons:
+            b.clicked.connect(self.clear_frequency)
+
         items = [str.format('{:>+3d}' if i != 0 else '{:>3d}', i)
                  for i in range(-11, 13)]
         self.timeZoneComboBox.addItems(items)
@@ -142,6 +151,17 @@ class MainWindow(QMainWindow):
             exit(0)
 
 
+    def clear_frequency(self):
+        if self.mode == 0:  # F2
+            self.doubleSpinBoxF2.setValue(0)
+
+        elif self.mode == 1:  # F1
+            self.doubleSpinBoxF1.setValue(0)
+
+        elif self.mode == 2:  # E
+            self.doubleSpinBoxE.setValue(0)
+
+
     def move_left(self):
 
         if self.iono:
@@ -168,17 +188,17 @@ class MainWindow(QMainWindow):
         if self.iono:
             gyro_2 = self.get_value(self.gyrofrequencyLineEdit)/2
 
-            if self.mode == 0:  # F2
+            if self.mode == 0 and self.doubleSpinBoxF2.value():  # F2
                 f = self.doubleSpinBoxF2.value() + gyro_2
                 if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]-1):
                     self.doubleSpinBoxF2.setValue(f)
 
-            elif self.mode == 1:  # F1
+            elif self.mode == 1 and self.doubleSpinBoxF1.value():  # F1
                 f = self.doubleSpinBoxF1.value() + gyro_2
-                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1])-1:
+                if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]-1):
                     self.doubleSpinBoxF1.setValue(f)
 
-            elif self.mode == 2:  # E
+            elif self.mode == 2 and self.doubleSpinBoxE.value():  # E
                 f = self.doubleSpinBoxE.value() + gyro_2
                 if f <= self.iono.coord_to_freq(self.iono.get_extent()[1]-1):
                     self.doubleSpinBoxE.setValue(f)
@@ -276,19 +296,23 @@ class MainWindow(QMainWindow):
 
         widgets = [
             self.doubleSpinBoxE, self.doubleSpinBoxF1, self.doubleSpinBoxF2,
-            self.listWidgetE, self.listWidgetF1, self.listWidgetF2]
+            self.listWidgetE, self.listWidgetF1, self.listWidgetF2,
+            self.buttonClearF2, self.buttonClearF1, self.buttonClearE]
         for w in widgets:
             w.setEnabled(False)
 
         if mode == 0:
             self.doubleSpinBoxF2.setEnabled(True)
             self.listWidgetF2.setEnabled(True)
+            self.buttonClearF2.setEnabled(True)
         elif mode == 1:
             self.doubleSpinBoxF1.setEnabled(True)
             self.listWidgetF1.setEnabled(True)
+            self.buttonClearF1.setEnabled(True)
         elif mode == 2:
             self.doubleSpinBoxE.setEnabled(True)
             self.listWidgetE.setEnabled(True)
+            self.buttonClearE.setEnabled(True)
 
 
     def onclick(self, event):
@@ -335,7 +359,7 @@ class MainWindow(QMainWindow):
             t = self.listWidgetE.item(i).text().split()
             x_e.append(self.iono.freq_to_coord(t[0]))
             y_e.append(float(t[1]))
-        self.e_scatter = self.ax.scatter(x_e, y_e, c='g')
+        self.e_scatter = self.ax.scatter(x_e, y_e, c=self.E_COLOR)
 
         if self.f1_scatter is not None:
             self.f1_scatter.remove()
@@ -346,7 +370,7 @@ class MainWindow(QMainWindow):
             t = self.listWidgetF1.item(i).text().split()
             x_f1.append(self.iono.freq_to_coord(t[0]))
             y_f1.append(float(t[1]))
-        self.f1_scatter = self.ax.scatter(x_f1, y_f1, c='c')
+        self.f1_scatter = self.ax.scatter(x_f1, y_f1, c=self.F1_COLOR)
 
         if self.f2_scatter is not None:
             self.f2_scatter.remove()
@@ -357,7 +381,7 @@ class MainWindow(QMainWindow):
             t = self.listWidgetF2.item(i).text().split()
             x_f2.append(self.iono.freq_to_coord(t[0]))
             y_f2.append(float(t[1]))
-        self.f2_scatter = self.ax.scatter(x_f2, y_f2, c='r')
+        self.f2_scatter = self.ax.scatter(x_f2, y_f2, c=self.F2_COLOR)
 
         self.canvas.draw()
 
@@ -388,11 +412,11 @@ class MainWindow(QMainWindow):
                 return line
 
         self.f2_critical = plot_line(
-            self.doubleSpinBoxF2, self.f2_critical, 'r')
+            self.doubleSpinBoxF2, self.f2_critical, self.F2_COLOR)
         self.f1_critical = plot_line(
-            self.doubleSpinBoxF1, self.f1_critical, 'c')
+            self.doubleSpinBoxF1, self.f1_critical, self.F1_COLOR)
         self.e_critical = plot_line(
-            self.doubleSpinBoxE, self.e_critical, 'g')
+            self.doubleSpinBoxE, self.e_critical, self.E_COLOR)
 
         self.canvas.draw()
 
@@ -443,12 +467,7 @@ class MainWindow(QMainWindow):
                 self.ax = self.figure.add_subplot(111)
 
                 extent = self.iono.get_extent()
-                # cmap = colors.ListedColormap([
-                #     '#6E1E5A', '#782064', '#8C189A', '#9F2883',
-                #     '#AF4EC2', '#CA89D8', '#D9A8E1', '#FFFFFF',
-                #     '#eeeeee', '#bcbcbc', '#aaaaaa',
-                #     '#909090', '#606060', '#353535', '#000000'
-                # ])
+
                 self.im_iono = self.ax.imshow(data, cmap=self.iono.cmap, interpolation='nearest',
                                extent=extent, aspect='auto')
 
@@ -726,6 +745,17 @@ class MainWindow(QMainWindow):
             ' (' + ursi_code + ')' if ursi_code else '',
             self.dateTimeEdit.dateTime().toString(DATE_TIME_FORMAT),
             'UTC' if time_zone == '0' else 'UTC'+time_zone)
+
+        foF2 = self.doubleSpinBoxF2.value()
+        foF1 = self.doubleSpinBoxF1.value()
+        foE = self.doubleSpinBoxE.value()
+        foF2 = f'foF2 = {foF2:.2f} MHz   ' if foF2 else ''
+        foF1 = f'foF1 = {foF1:.2f} MHz   ' if foF1 else ''
+        foE = f'foE = {foE:.2f} MHz' if foE else ''
+
+        if foF2 or foF1 or foE:
+            description += f'\n{foF2}{foF1}{foE}'
+            
         return description
 
 

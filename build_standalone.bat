@@ -1,3 +1,4 @@
+echo exec "conda activate base" before
 python -m nuitka --standalone --follow-imports --nofollow-import-to=tkinter --disable-console --enable-plugin=pyqt5 --assume-yes-for-downloads IonogramViewer2.py
 rmdir /q /s IonogramViewer2.build
 ren IonogramViewer2.dist IonogramViewer2

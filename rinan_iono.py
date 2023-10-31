@@ -3,6 +3,7 @@ import numpy as np
 from datetime import datetime
 from configparser import ConfigParser, NoSectionError, NoOptionError
 from iono import Iono
+from colormaps import cmap_two_comp
 
 
 class RinanIono(Iono):
@@ -15,7 +16,7 @@ class RinanIono(Iono):
             lines = [s.strip() for s in file.readlines()]
 
         if file_name.lower().endswith('.pion'):
-            self.cmap = 'seismic'
+            self.cmap = cmap_two_comp
 
         index_freq = lines.index('Frequency Set')
         index_end_of_header = lines.index('END')

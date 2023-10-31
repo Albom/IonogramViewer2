@@ -1,6 +1,7 @@
 from datetime import datetime
 from math import sin
 from iono import Iono
+from colormaps import cmap_two_comp
 
 
 class DpsAmpIono(Iono):
@@ -8,7 +9,7 @@ class DpsAmpIono(Iono):
     def __init__(self):
         super().__init__()
         self.ursi_code = None
-        self.cmap = 'seismic'
+        self.cmap = cmap_two_comp
 
     def load(self, file_name):
 

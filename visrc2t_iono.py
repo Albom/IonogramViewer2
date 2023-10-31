@@ -5,6 +5,7 @@ from struct import unpack
 import bz2
 import cv2
 from iono import Iono
+from colormaps import cmap_two_comp
 
 
 class Visrc2tIono(Iono):
@@ -19,7 +20,7 @@ class Visrc2tIono(Iono):
         self.gyro = 1.4
         self.dip = 66.7
         self.debug_level = debug_level
-        self.cmap = 'seismic'
+        self.cmap = cmap_two_comp
 
 
     def __read_raw_data(self, file_name):
@@ -137,8 +138,15 @@ class Visrc2tIono(Iono):
 
         max_abs = max(abs(min_val), abs(max_val))
 
-        self.data[0][0] = -max_abs
-        self.data[-1][-1] = max_abs
+        if abs(min_val/max_abs) < 0.95:
+            self.data[self.data < 0] *= -max_abs/min_val
+
+        if abs(max_val/max_abs) < 0.95:
+            self.data[self.data < 0] *= max_abs/max_val
+
+
+        # self.data[0][0] = -max_abs
+        # self.data[-1][-1] = max_abs
 
         # hist = np.histogram(self.data, bins=50)
         # np.savetxt('out_y.txt', hist[0])

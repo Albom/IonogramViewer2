@@ -1,6 +1,7 @@
 
 from datetime import datetime, timedelta
 from sunspot_loader import Sunspots
+from colormaps import cmap_one_comp
 
 
 class Iono:
@@ -17,7 +18,7 @@ class Iono:
         self.dip = 0
         self.sunspot = -1
         self.debug_level = debug_level
-        self.cmap = 'binary'
+        self.cmap = cmap_one_comp
 
     def get_data(self):
         return self.data
