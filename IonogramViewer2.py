@@ -146,9 +146,25 @@ class MainWindow(QMainWindow):
 
         self.showMaximized()
 
+        self.setAcceptDrops(True)
+
         if import_error is not None:
             self.show_error(import_error)
             exit(0)
+
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+
+    def dropEvent(self, event):
+        files = [u.toLocalFile() for u in event.mimeData().urls()]
+        first_file = files[0]
+        if not path.isdir(first_file):
+            self.open_file(first_file)
 
 
     def clear_frequency(self):
