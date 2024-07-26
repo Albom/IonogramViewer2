@@ -2,20 +2,22 @@ import sys
 from os import path
 from datetime import datetime, timedelta
 import re
-from matplotlib import colors
+from PyQt6 import uic
+from PyQt6.QtGui import QFont
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
+    QMainWindow,
+    QApplication,
+    QFileDialog,
+    QMenu,
+    QMessageBox,
+    QDialog,
+)
+from matplotlib import use as matplotlib_backend_use
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from PyQt5 import uic
-from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMenu, QMessageBox
-from PyQt5.Qt import QDialog
-
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import numpy as np
 
-import matplotlib
-
-matplotlib.use("agg")
 
 import_error = None
 
@@ -36,7 +38,11 @@ except ModuleNotFoundError as err:
     search_result = quoted.findall(str(err).replace("'", '"'))
     if search_result:
         if search_result[0].replace('"', "") == "cv2":
-            import_error = "OpenCV is not installed.\n\nYou can install it by:\npip install opencv-python"
+            import_error = """
+            OpenCV is not installed.<br><br>
+            You can install it by:<br>
+            <b>pip install opencv-python</b>
+            """
         else:
             import_error = str(err)
 
@@ -110,7 +116,7 @@ class MainWindow(QMainWindow):
 
         listWidgets = [self.listWidgetE, self.listWidgetF1, self.listWidgetF2]
         for w in listWidgets:
-            w.setContextMenuPolicy(Qt.CustomContextMenu)
+            w.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             w.customContextMenuRequested.connect(self.delete_menu)
 
         spinBoxes = [self.doubleSpinBoxF2, self.doubleSpinBoxF1, self.doubleSpinBoxE]
@@ -126,7 +132,7 @@ class MainWindow(QMainWindow):
         ]
         self.timeZoneComboBox.addItems(items)
         font = QFont("Monospace")
-        font.setStyleHint(QFont.TypeWriter)
+        font.setStyleHint(QFont.StyleHint.TypeWriter)
         self.timeZoneComboBox.setFont(font)
 
         self.properties_of_iono = [
@@ -233,10 +239,10 @@ class MainWindow(QMainWindow):
 
     def remote(self):
         wnd = RemoteWnd()
-        wnd.exec_()
+        wnd.exec()
 
     def png_state_changed(self, state):
-        s = state == Qt.Checked
+        s = state == Qt.CheckState.Checked
         elements = [
             self.pngDefaultButton,
             self.pngWidthSpinBox,
@@ -354,7 +360,7 @@ class MainWindow(QMainWindow):
 
                     modifiers = QApplication.keyboardModifiers()
                     # subract half of hyrofrequency if Shift key is pressed
-                    if modifiers == Qt.ShiftModifier:
+                    if modifiers == Qt.KeyboardModifier.ShiftModifier:
                         f = round(
                             self.iono.coord_to_freq(event.xdata)
                             - self.get_value(self.gyrofrequencyLineEdit) / 2,
@@ -445,7 +451,7 @@ class MainWindow(QMainWindow):
             h = event.ydata
             self.statusbar.showMessage("f={:5.2f}  h'={:5.1f}".format(f, h))
             if not self.is_cross:
-                QApplication.setOverrideCursor(Qt.CrossCursor)
+                QApplication.setOverrideCursor(Qt.CursorShape.CrossCursor)
                 self.is_cross = True
         else:
             self.statusbar.showMessage("")
@@ -518,7 +524,13 @@ class MainWindow(QMainWindow):
                 else:
                     self.sunspotNumberLineEdit.setText("")
                     if not self.actionIgnore_errors.isChecked():
-                        self.show_error("Sunspot number is not found.\n\nFile \"SN_d_tot_V2.0.txt\" is probably outdated.\nPlease update it from\nhttp://www.sidc.be/silso/DATA/SN_d_tot_V2.0.txt")
+                        error_message = """
+                        Sunspot number is not found.<br><br>
+                        File <b>SN_d_tot_V2.0.txt</b> is probably outdated.<br>
+                        Please update it from<br>
+                        <a href='http://www.sidc.be/silso/DATA/SN_d_tot_V2.0.txt'>http://www.sidc.be/silso/DATA/SN_d_tot_V2.0.txt</a>
+                        """
+                        self.show_error(error_message)
 
                 time_zone = self.iono.get_timezone()
                 position = self.timeZoneComboBox.findText(
@@ -790,26 +802,26 @@ class MainWindow(QMainWindow):
         return description
 
     def action_ox_traces(self):
-            data = np.copy(self.iono.get_data())
+        data = np.copy(self.iono.get_data())
 
-            if not self.actionO_trace.isChecked():
-                data[data > 0] = 0
+        if not self.actionO_trace.isChecked():
+            data[data > 0] = 0
 
-            if not self.actionX_trace.isChecked():
-                data[data < 0] = 0
+        if not self.actionX_trace.isChecked():
+            data[data < 0] = 0
 
-            self.im_iono.set_data(data)
+        self.im_iono.set_data(data)
 
-            self.figure.canvas.draw()
-
+        self.figure.canvas.draw()
 
     def show_error(self, message):
         msg = QMessageBox()
-        msg.setIcon(QMessageBox.Critical)
+        msg.setIcon(QMessageBox.Icon.Critical)
+        msg.setTextFormat(Qt.RichText)
         msg.setText(message)
         msg.setWindowTitle("Error")
         msg.show()
-        msg.exec_()
+        msg.exec()
 
     def show_about(self):
         about = f"""<b>{self.program_name}</b>
@@ -823,12 +835,12 @@ class MainWindow(QMainWindow):
                  """
 
         msg = QMessageBox()
-        msg.setIcon(QMessageBox.Information)
-        msg.setTextFormat(Qt.RichText)
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.setTextFormat(Qt.TextFormat.RichText)
         msg.setText(about)
         msg.setWindowTitle("About")
         msg.show()
-        msg.exec_()
+        msg.exec()
 
 
 class RemoteWnd(QDialog):
@@ -860,7 +872,7 @@ class RemoteWnd(QDialog):
                 n_files = loader.saveTo(directory_name, start, end)
 
                 msg = QMessageBox()
-                msg.setIcon(QMessageBox.Information)
+                msg.setIcon(QMessageBox.Icon.Information)
                 msg.setText(str(n_files) + " file(s) loaded.")
                 msg.setWindowTitle("Remote")
                 msg.show()
@@ -868,9 +880,10 @@ class RemoteWnd(QDialog):
 
 
 if __name__ == "__main__":
+    matplotlib_backend_use("agg")
     app = QApplication(sys.argv)
 
     main = MainWindow()
     main.show()
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
