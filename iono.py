@@ -19,6 +19,7 @@ class Iono:
         self.sunspot = -1
         self.debug_level = debug_level
         self.cmap = cmap_one_comp
+        self.ox_mode = False
 
     def get_data(self):
         return self.data

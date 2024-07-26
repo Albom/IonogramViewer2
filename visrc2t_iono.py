@@ -21,6 +21,7 @@ class Visrc2tIono(Iono):
         self.dip = 66.7
         self.debug_level = debug_level
         self.cmap = cmap_two_comp
+        self.ox_mode = True
 
 
     def __read_raw_data(self, file_name):

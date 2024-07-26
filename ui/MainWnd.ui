@@ -315,6 +315,9 @@
    </widget>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -336,6 +339,11 @@
    <addaction name="separator"/>
    <addaction name="actionMoveLeft"/>
    <addaction name="actionMoveRight"/>
+   <addaction name="separator"/>
+   <addaction name="actionO_trace"/>
+   <addaction name="actionX_trace"/>
+   <addaction name="separator"/>
+   <addaction name="actionIgnore_errors"/>
    <addaction name="actionClean"/>
    <addaction name="separator"/>
    <addaction name="actionHelp"/>
@@ -984,6 +992,65 @@ number</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionO_trace">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>images/o-trace.png</normaloff>
+     <normalon>images/o-trace.png</normalon>images/o-trace.png</iconset>
+   </property>
+   <property name="text">
+    <string>O-trace</string>
+   </property>
+   <property name="toolTip">
+    <string>O-trace</string>
+   </property>
+  </action>
+  <action name="actionX_trace">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normalon>images/x-trace.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>X-trace</string>
+   </property>
+   <property name="toolTip">
+    <string>X-trace</string>
+   </property>
+  </action>
+  <action name="actionIgnore_errors">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>images/Martz90-Circle-Addon2-Warning.24.png</normaloff>images/Martz90-Circle-Addon2-Warning.24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ignore errors</string>
+   </property>
+   <property name="toolTip">
+    <string>Ignore errors</string>
    </property>
   </action>
  </widget>
