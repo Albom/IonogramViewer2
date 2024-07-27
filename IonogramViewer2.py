@@ -301,7 +301,7 @@ class MainWindow(QMainWindow):
             delete_action = listMenu.addAction("Delete")
             delete_all_action = listMenu.addAction("Delete all")
             point_global = self.sender().mapToGlobal(point)
-            r = listMenu.exec_(point_global)
+            r = listMenu.exec(point_global)
             if r is delete_action:
                 item = self.sender().row(self.sender().itemAt(point))
                 self.sender().takeItem(item)
@@ -876,7 +876,7 @@ class RemoteWnd(QDialog):
                 msg.setText(str(n_files) + " file(s) loaded.")
                 msg.setWindowTitle("Remote")
                 msg.show()
-                msg.exec_()
+                msg.exec()
 
 
 if __name__ == "__main__":
