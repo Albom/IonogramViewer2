@@ -32,7 +32,6 @@ try:
     from rinan_iono import RinanIono
     from karazin_iono import KarazinIono
     from iono_tester import IonoTester
-    from colormaps import cmap_two_comp
 except ModuleNotFoundError as err:
     quoted = re.compile('"[^"]*"')
     search_result = quoted.findall(str(err).replace("'", '"'))
@@ -817,7 +816,7 @@ class MainWindow(QMainWindow):
     def show_error(self, message):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Icon.Critical)
-        msg.setTextFormat(Qt.RichText)
+        msg.setTextFormat(Qt.TextFormat.RichText)
         msg.setText(message)
         msg.setWindowTitle("Error")
         msg.show()
