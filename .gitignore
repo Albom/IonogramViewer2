@@ -4,4 +4,6 @@ __pycache__/
 .pydevproject
 IonogramViewer2.build/
 IonogramViewer2.dist/
+IonogramViewer2.onefile-build/
 IonogramViewer2/
+data/f2o.hdf5

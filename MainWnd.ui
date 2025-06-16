@@ -3,7 +3,7 @@
  <class>mainWindow</class>
  <widget class="QMainWindow" name="mainWindow">
   <property name="windowModality">
-   <enum>Qt::NonModal</enum>
+   <enum>Qt::WindowModality::NonModal</enum>
   </property>
   <property name="enabled">
    <bool>true</bool>
@@ -63,7 +63,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>26</height>
+     <height>33</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -98,20 +98,20 @@
    <property name="minimumSize">
     <size>
      <width>180</width>
-     <height>784</height>
+     <height>600</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>180</width>
-     <height>524287</height>
+     <height>600</height>
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::DockWidgetFeature::DockWidgetFloatable|QDockWidget::DockWidgetFeature::DockWidgetMovable</set>
    </property>
    <property name="allowedAreas">
-    <set>Qt::LeftDockWidgetArea</set>
+    <set>Qt::DockWidgetArea::LeftDockWidgetArea</set>
    </property>
    <property name="windowTitle">
     <string>Layers</string>
@@ -123,16 +123,13 @@
     <layout class="QGridLayout" name="gridLayout_7">
      <item row="0" column="0">
       <layout class="QGridLayout" name="gridLayout_6">
-       <item row="7" column="0">
-        <widget class="QDoubleSpinBox" name="doubleSpinBoxE">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
+       <item row="3" column="0" colspan="2">
+        <widget class="QRadioButton" name="radioButtonF1">
          <property name="toolTip">
-          <string>foE</string>
+          <string notr="true">The F1 trace data group</string>
          </property>
-         <property name="singleStep">
-          <double>0.010000000000000</double>
+         <property name="text">
+          <string notr="true">F1</string>
          </property>
         </widget>
        </item>
@@ -143,59 +140,6 @@
          </property>
          <property name="singleStep">
           <double>0.010000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QDoubleSpinBox" name="doubleSpinBoxF1">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="toolTip">
-          <string>foF1</string>
-         </property>
-         <property name="singleStep">
-          <double>0.010000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QPushButton" name="buttonClearF2">
-         <property name="text">
-          <string notr="true"/>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normaloff>images/icons8-close-16.png</normaloff>images/icons8-close-16.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>16</width>
-           <height>16</height>
-          </size>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-         <property name="default">
-          <bool>false</bool>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QListWidget" name="listWidgetF2">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="toolTip">
-          <string notr="true">The trace points (f in MHz, h' in km)
-(Left-click)</string>
-         </property>
-         <property name="sortingEnabled">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -210,6 +154,26 @@
          </property>
          <property name="sortingEnabled">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QRadioButton" name="radioButtonF2">
+         <property name="toolTip">
+          <string notr="true">The F2 trace data group</string>
+         </property>
+         <property name="text">
+          <string notr="true">F2</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0" colspan="2">
+        <widget class="QRadioButton" name="radioButtonEs">
+         <property name="text">
+          <string>Es</string>
          </property>
         </widget>
        </item>
@@ -253,42 +217,6 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QRadioButton" name="radioButtonF1">
-         <property name="toolTip">
-          <string notr="true">The F1 trace data group</string>
-         </property>
-         <property name="text">
-          <string notr="true">F1</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QRadioButton" name="radioButtonF2">
-         <property name="toolTip">
-          <string notr="true">The F2 trace data group</string>
-         </property>
-         <property name="text">
-          <string notr="true">F2</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" colspan="2">
-        <widget class="QRadioButton" name="radioButtonE">
-         <property name="toolTip">
-          <string notr="true">The E trace data group</string>
-         </property>
-         <property name="text">
-          <string notr="true">E</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
        <item row="7" column="1">
         <widget class="QPushButton" name="buttonClearE">
          <property name="enabled">
@@ -306,6 +234,122 @@
            <width>16</width>
            <height>16</height>
           </size>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="QPushButton" name="buttonClearEs">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>images/icons8-close-16.png</normaloff>images/icons8-close-16.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBoxF1">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="toolTip">
+          <string>foF1</string>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="buttonClearF2">
+         <property name="text">
+          <string notr="true"/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>images/icons8-close-16.png</normaloff>images/icons8-close-16.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>false</bool>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="2">
+        <widget class="QRadioButton" name="radioButtonE">
+         <property name="toolTip">
+          <string notr="true">The E trace data group</string>
+         </property>
+         <property name="text">
+          <string notr="true">E</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBoxE">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="toolTip">
+          <string>foE</string>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBoxEs">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QListWidget" name="listWidgetF2">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string notr="true">The trace points (f in MHz, h' in km)
+(Left-click)</string>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0" colspan="2">
+        <widget class="QListWidget" name="listWidgetEs">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -345,11 +389,13 @@
    <addaction name="separator"/>
    <addaction name="actionIgnore_errors"/>
    <addaction name="actionClean"/>
+   <addaction name="action_ANN"/>
    <addaction name="separator"/>
    <addaction name="actionHelp"/>
    <addaction name="actionAbout"/>
    <addaction name="separator"/>
    <addaction name="actionExit"/>
+   <addaction name="separator"/>
   </widget>
   <widget class="QDockWidget" name="dockWidget_2">
    <property name="sizePolicy">
@@ -360,7 +406,7 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>281</width>
+     <width>297</width>
      <height>633</height>
     </size>
    </property>
@@ -377,10 +423,10 @@
     <bool>false</bool>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::DockWidgetFeature::DockWidgetFloatable|QDockWidget::DockWidgetFeature::DockWidgetMovable</set>
    </property>
    <property name="allowedAreas">
-    <set>Qt::RightDockWidgetArea</set>
+    <set>Qt::DockWidgetArea::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
     <string>Parameters</string>
@@ -391,7 +437,7 @@
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QGridLayout" name="gridLayout">
      <property name="sizeConstraint">
-      <enum>QLayout::SetMinimumSize</enum>
+      <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
      </property>
      <property name="leftMargin">
       <number>5</number>
@@ -417,13 +463,13 @@
         </sizepolicy>
        </property>
        <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
+        <enum>Qt::LayoutDirection::LeftToRight</enum>
        </property>
        <property name="title">
         <string>Parameters of saving</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
        </property>
        <property name="flat">
         <bool>false</bool>
@@ -436,7 +482,7 @@
          <number>5</number>
         </property>
         <property name="sizeConstraint">
-         <enum>QLayout::SetDefaultConstraint</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <property name="leftMargin">
          <number>5</number>
@@ -453,7 +499,7 @@
         <item>
          <layout class="QGridLayout" name="gridLayout_4">
           <property name="sizeConstraint">
-           <enum>QLayout::SetMinimumSize</enum>
+           <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
           </property>
           <property name="leftMargin">
            <number>5</number>
@@ -553,7 +599,7 @@
           <item row="2" column="0" colspan="2">
            <widget class="Line" name="line">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
            </widget>
           </item>
@@ -561,6 +607,16 @@
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>Width (inches)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="jsonCheckBox">
+            <property name="text">
+             <string>JSON file</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -590,14 +646,14 @@
         <string>Ionogram parameters</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
          <number>5</number>
         </property>
         <property name="sizeConstraint">
-         <enum>QLayout::SetDefaultConstraint</enum>
+         <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
         </property>
         <property name="leftMargin">
          <number>5</number>
@@ -628,86 +684,36 @@
           <property name="spacing">
            <number>5</number>
           </property>
-          <item row="2" column="0" colspan="2">
-           <widget class="Line" name="line_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="longDegLabel">
-            <property name="text">
-             <string>Long. (deg.)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>URSI code
-(if present)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="latLineEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0" colspan="2">
-           <widget class="Line" name="line_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
           <item row="9" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Date &amp; Time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="0">
            <widget class="QLabel" name="label_4">
             <property name="text">
              <string>Time zone</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="ursiCodeEdit">
-            <property name="enabled">
-             <bool>false</bool>
+          <item row="6" column="0">
+           <widget class="QLabel" name="sunspotNumberLabel">
+            <property name="text">
+             <string>Sunspot 
+number</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="longLineEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLineEdit" name="gyrofrequencyLineEdit">
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="latLineEdit">
             <property name="enabled">
              <bool>false</bool>
             </property>
            </widget>
           </item>
           <item row="5" column="0">
-           <widget class="QLabel" name="gyrofrequencyLabel">
+           <widget class="QLabel" name="label_8">
             <property name="text">
-             <string>Gyro-
-frequency (MHz)</string>
+             <string>Dip angle (deg.)</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="1">
+          <item row="8" column="1">
            <widget class="QDateTimeEdit" name="dateTimeEdit">
             <property name="enabled">
              <bool>false</bool>
@@ -722,16 +728,16 @@ frequency (MHz)</string>
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="latDegLabel">
+           <widget class="QLabel" name="longDegLabel">
             <property name="text">
-             <string>Lat. (deg.)</string>
+             <string>Long. (deg.)</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="1">
-           <widget class="QComboBox" name="timeZoneComboBox">
-            <property name="enabled">
-             <bool>false</bool>
+          <item row="1" column="0" colspan="2">
+           <widget class="Line" name="line_4">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
            </widget>
           </item>
@@ -742,32 +748,67 @@ frequency (MHz)</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
-           <widget class="QLineEdit" name="sunspotNumberLineEdit">
+          <item row="7" column="0" colspan="2">
+           <widget class="Line" name="line_3">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
+           <widget class="QComboBox" name="timeZoneComboBox">
             <property name="enabled">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="sunspotNumberLabel">
-            <property name="text">
-             <string>Sunspot 
-number</string>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="longLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="5" column="1">
            <widget class="QLineEdit" name="dipAngleLineEdit">
             <property name="enabled">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="label_8">
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="sunspotNumberLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>Dip angle (deg.)</string>
+             <string>Date &amp; Time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="gyrofrequencyLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="latDegLabel">
+            <property name="text">
+             <string>Lat. (deg.)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="gyrofrequencyLabel">
+            <property name="text">
+             <string>Gyro-
+frequency (MHz)</string>
             </property>
            </widget>
           </item>
@@ -779,7 +820,7 @@ number</string>
      <item row="3" column="0">
       <spacer name="verticalSpacer">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Orientation::Vertical</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -1053,7 +1094,49 @@ number</string>
     <string>Ignore errors</string>
    </property>
   </action>
+  <action name="action_ANN">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/neural-network.png</normaloff>images/neural-network.png</iconset>
+   </property>
+   <property name="text">
+    <string>ANN</string>
+   </property>
+  </action>
  </widget>
+ <tabstops>
+  <tabstop>radioButtonF2</tabstop>
+  <tabstop>doubleSpinBoxF2</tabstop>
+  <tabstop>buttonClearF2</tabstop>
+  <tabstop>listWidgetF2</tabstop>
+  <tabstop>radioButtonF1</tabstop>
+  <tabstop>doubleSpinBoxF1</tabstop>
+  <tabstop>buttonClearF1</tabstop>
+  <tabstop>listWidgetF1</tabstop>
+  <tabstop>radioButtonE</tabstop>
+  <tabstop>doubleSpinBoxE</tabstop>
+  <tabstop>buttonClearE</tabstop>
+  <tabstop>listWidgetE</tabstop>
+  <tabstop>radioButtonEs</tabstop>
+  <tabstop>doubleSpinBoxEs</tabstop>
+  <tabstop>buttonClearEs</tabstop>
+  <tabstop>listWidgetEs</tabstop>
+  <tabstop>stationNameEdit</tabstop>
+  <tabstop>latLineEdit</tabstop>
+  <tabstop>longLineEdit</tabstop>
+  <tabstop>gyrofrequencyLineEdit</tabstop>
+  <tabstop>dipAngleLineEdit</tabstop>
+  <tabstop>sunspotNumberLineEdit</tabstop>
+  <tabstop>dateTimeEdit</tabstop>
+  <tabstop>timeZoneComboBox</tabstop>
+  <tabstop>jsonCheckBox</tabstop>
+  <tabstop>stdCheckBox</tabstop>
+  <tabstop>pngCheckBox</tabstop>
+  <tabstop>pngWidthSpinBox</tabstop>
+  <tabstop>pngHeightSpinBox</tabstop>
+  <tabstop>pngDpiSpinBox</tabstop>
+  <tabstop>pngDefaultButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

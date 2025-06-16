@@ -1,20 +1,19 @@
-
 import numpy as np
 from datetime import datetime
 from os import path
-from iono import Iono
+from ionogram import Ionogram
 
 
-class BazisIono(Iono):
+class IonogramBazis(Ionogram):
 
     def __init__(self):
         super().__init__()
 
     def load(self, file_name):
-        with open(file_name, 'rb') as file:
+        with open(file_name, "rb") as file:
             header_size = 21
             date = file.read(header_size)[1:-1].decode("utf-8")
-            self.date = datetime.strptime(date, '%d-%m-%Y %H:%M:%S')
+            self.date = datetime.strptime(date, "%d-%m-%Y %H:%M:%S")
 
             self.start_freq = 1.0
             self.n_rang = 250
@@ -26,8 +25,7 @@ class BazisIono(Iono):
             else:
                 return
 
-            self.data = \
-                [[0 for x in range(self.n_freq)] for y in range(self.n_rang)]
+            self.data = [[0 for x in range(self.n_freq)] for y in range(self.n_rang)]
 
             buf = file.read(file_size - header_size)
             offset = 0
@@ -56,6 +54,11 @@ class BazisIono(Iono):
 
             # self.data[0][0] = -np.max(self.data)
 
+            self.station_name = "Bazis (IION)"
+
+            if self.date:
+                self.load_sunspot()
+
     def get_altitude(self, h):
         # TODO check start and step values
         return 3 + h * 3
@@ -71,11 +74,6 @@ class BazisIono(Iono):
         return [float(x) for x in self.get_freq_labels()]
 
     def get_freq_labels(self):
-        return ['{:.1f}'.format(i) for i in range(
-            int(self.start_freq), int(self.get_extent()[1]))]
-
-
-if __name__ == '__main__':
-    iono = BazisIono()
-    iono.load('./examples/iion/NF190606.50')
-    print(iono.date)
+        return [
+            f"{i:.1f}" for i in range(int(self.start_freq), int(self.get_extent()[1]))
+        ]

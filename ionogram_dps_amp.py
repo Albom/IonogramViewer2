@@ -1,14 +1,13 @@
 from datetime import datetime
 from math import sin
-from iono import Iono
+from ionogram import Ionogram
 from colormaps import cmap_two_comp
 
 
-class DpsAmpIono(Iono):
+class IonogramDpsAmp(Ionogram):
 
     def __init__(self):
         super().__init__()
-        self.ursi_code = None
         self.cmap = cmap_two_comp
         self.ox_mode = True
 
@@ -19,21 +18,25 @@ class DpsAmpIono(Iono):
 
         self.date = datetime.strptime(lines[0], "%Y.%m.%d (%j) %H:%M:%S.%f")
 
+        ursi_code = None
         for line in lines[1:4]:
             if line.startswith("Station name"):
                 self.station_name = line.split(":")[-1].strip()
             elif line.startswith("URSI code"):
-                self.ursi_code = line.split(":")[-1].strip()
+                ursi_code = line.split(":")[-1].strip()
             elif line.startswith("Ionosonde model"):
                 self.ionosonde_model = line.split(":")[-1].strip()
 
-        self.columns = [line.strip() for line in lines[4].split()]
+        if ursi_code:
+            self.station_name = f"{self.station_name} ({ursi_code})"
 
-        data = {x: [] for x in self.columns}
+        columns = [line.strip() for line in lines[4].split()]
+
+        data = {x: [] for x in columns}
         for line in lines[5:]:
             values = line.split()
             for n_col, value in enumerate(values):
-                data[self.columns[n_col]].append(value)
+                data[columns[n_col]].append(value)
 
         self.frequencies = sorted([float(x) for x in set(data["Freq"])])
         self.ranges = sorted([float(x) for x in set(data["Range"])])
@@ -69,15 +72,6 @@ class DpsAmpIono(Iono):
 
     def get_freq_labels(self):
         return [
-            "{:.1f}".format(i)
+            f"{i:.1f}"
             for i in range(int(self.frequencies[0]), int(self.frequencies[-1]) + 1)
         ]
-
-    def get_ursi_code(self):
-        return self.ursi_code
-
-
-if __name__ == "__main__":
-    iono = DpsAmpIono()
-    iono.load("./examples/dps_amp/00_00.txt")
-    print(iono.get_extent())

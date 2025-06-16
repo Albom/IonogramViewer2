@@ -1,17 +1,16 @@
-
-from datetime import datetime, timedelta
+from datetime import timedelta
 from sunspot_loader import Sunspots
 from colormaps import cmap_one_comp
 
 
-class Iono:
+class Ionogram:
 
     def __init__(self, debug_level=0):
         self.data = None
         self.date = None
         self.timezone = 0
-        self.station_name = ''
-        self.ionosonde_model = ''
+        self.station_name = ""
+        self.ionosonde_model = ""
         self.lat = 0
         self.lon = 0
         self.gyro = 0
