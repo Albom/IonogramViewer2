@@ -47,8 +47,6 @@ class STDFileIO:
                 file.write("\n".join([first_line, second_line, third_line]))
 
                 def write_layer(critical_frequency, layer_points):
-                    print(layer_points)
-
                     file.write(f"{critical_frequency}\n" if critical_frequency else "99.0\n")
                     file.write("\n".join(layer_points + [""]) if layer_points else "")
                     file.write("END\n")
