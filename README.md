@@ -11,8 +11,8 @@ A program for scaling ionograms obtained using:
  - DPS-4 digisondes (exported by SAOExplorer program).
 
 ## Short manual:
-- Open file with an ionogram (Ctrl + O). Drag and Drop can be also used.
-- Mark critical frequencies of F2, F1 and E layers (right clicks).
-- Mark traces of F2, F1 and E layers (left clicks).
+- Open file with an ionogram (Ctrl + O). Drag and Drop can be also used. File name as command line parameter is supported.
+- Mark critical frequencies of F2, F1, E and Es layers (right clicks).
+- Mark traces of F2, F1, E, and Es layers (left clicks).
 - Save the results (Ctrl + S).
 - Go to the next (Ctrl + Space) or previous (Ctrl + Shift + Space) ionogram in the current directory.
