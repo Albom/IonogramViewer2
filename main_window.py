@@ -453,40 +453,57 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             h = event.ydata
             s = f"{f:5.2f} {h:5.1f}"
 
+            modifiers = QApplication.keyboardModifiers()
+
             if event.button == 1:
 
-                if self.mode == 0:  # F2
-                    self.listWidgetF2.addItem(s)
-                elif self.mode == 1:  # F1
-                    self.listWidgetF1.addItem(s)
-                elif self.mode == 2:  # E
-                    self.listWidgetE.addItem(s)
-                elif self.mode == 3:  # Es
-                    self.listWidgetEs.addItem(s)
+                widgets = {
+                    0: self.listWidgetF2,
+                    1: self.listWidgetF1,
+                    2: self.listWidgetE,
+                    3: self.listWidgetEs,
+                }
+                widget = widgets[self.mode]
+
+                if modifiers == Qt.KeyboardModifier.ControlModifier:
+
+                    def find_closest_point_index(new_point, points):
+                        points = np.array(points)
+                        distances = np.linalg.norm(points - new_point, axis=1)
+                        index = np.argmin(distances)
+                        return index
+
+                    layer_lines = [widget.item(i).text() for i in range(widget.count())]
+                    if layer_lines:
+                        points = [[float(v) for v in x.split()] for x in layer_lines]
+                        point_index = find_closest_point_index([f, h], points)
+                        if (
+                            abs(f - points[point_index][0]) < 0.05
+                            and abs(h - points[point_index][1]) < 5
+                        ):
+                            widget.takeItem(point_index)
+
+                else:
+                    widget.addItem(s)
 
             elif event.button == 3:
 
-                if self.mode == 0:  # F2
+                # subract half of hyrofrequency if Shift key is pressed
+                if modifiers == Qt.KeyboardModifier.ShiftModifier:
+                    f = round(
+                        self.iono.coord_to_freq(event.xdata)
+                        - self.get_value(self.gyrofrequencyLineEdit) / 2,
+                        2,
+                    )
 
-                    modifiers = QApplication.keyboardModifiers()
-                    # subract half of hyrofrequency if Shift key is pressed
-                    if modifiers == Qt.KeyboardModifier.ShiftModifier:
-                        f = round(
-                            self.iono.coord_to_freq(event.xdata)
-                            - self.get_value(self.gyrofrequencyLineEdit) / 2,
-                            2,
-                        )
-
-                    self.doubleSpinBoxF2.setValue(f)
-
-                elif self.mode == 1:  # F1
-                    self.doubleSpinBoxF1.setValue(f)
-
-                elif self.mode == 2:  # E
-                    self.doubleSpinBoxE.setValue(f)
-
-                elif self.mode == 3:  # Es
-                    self.doubleSpinBoxEs.setValue(f)
+                widgets = {
+                    0: self.doubleSpinBoxF2,
+                    1: self.doubleSpinBoxF1,
+                    2: self.doubleSpinBoxE,
+                    3: self.doubleSpinBoxEs,
+                }
+                widget = widgets[self.mode]
+                widget.setValue(f)
 
             self.plot_scatters()
 
