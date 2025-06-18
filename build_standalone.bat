@@ -10,7 +10,7 @@ python -m nuitka ^
   --windows-icon-from-ico=images/IonogramViewer2_icon.png ^
   --windows-company-name=IION ^
   --windows-product-name=IonogramViewer2 ^
-  --windows-product-version=1.7.0 ^
+  --windows-product-version=1.7.1 ^
   --windows-file-description="A program for scaling ionograms." ^
   IonogramViewer2.py
 
