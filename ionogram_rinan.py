@@ -137,6 +137,7 @@ class IonogramRinan(Ionogram):
         f_max = int(self.get_extent()[1])
         labels = [f"{self.coord_to_freq(float(x)):.0f}" for x in range(f_min, f_max)]
         labels = list(set(labels))
+        labels = [x for x in labels if int(x)%2 == 0]
         return labels
 
     def freq_to_coord(self, freq):

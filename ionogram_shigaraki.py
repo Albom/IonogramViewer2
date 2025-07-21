@@ -69,6 +69,6 @@ class IonogramShigaraki(Ionogram):
 
     def get_freq_labels(self):
         return [
-            f"{i:.1f}"
+            f"{i:.0f}"
             for i in range(int(self.get_extent()[0]), int(self.get_extent()[1]))
         ]

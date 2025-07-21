@@ -25,7 +25,7 @@ from json_file_format import JsonFileIO
 from ionospheric_layer_trace import IonosphericLayerTrace, IonosphericLayers
 from program_version import PROGRAM_VERSION
 
-DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm"
+DATE_TIME_FORMAT = "yyyy-MM-dd hh:mm:ss"
 
 
 class MainWindow(QMainWindow, Ui_mainWindow):
@@ -33,6 +33,8 @@ class MainWindow(QMainWindow, Ui_mainWindow):
     def __init__(self, program_configuration):
 
         super().__init__()
+
+        self.program_configuration = program_configuration
 
         matplotlib_backend_use("agg")
 
@@ -54,10 +56,10 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
         self.im_iono = None
 
-        self.F2_COLOR = "#F51020"
-        self.F1_COLOR = "#10E0E0"
-        self.E_COLOR = "#10C010"
-        self.ES_COLOR = "#F0B000"
+        self.f2_color = self.program_configuration.f2_color
+        self.f1_color = self.program_configuration.f1_color
+        self.e_color = self.program_configuration.e_color
+        self.es_color = self.program_configuration.es_color
 
         self.setupUi(self)
 
@@ -517,7 +519,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             t = self.listWidgetE.item(i).text().split()
             x_e.append(self.iono.freq_to_coord(t[0]))
             y_e.append(float(t[1]))
-        self.e_scatter = self.ax.scatter(x_e, y_e, c=self.E_COLOR)
+        self.e_scatter = self.ax.scatter(x_e, y_e, c=self.e_color)
 
         if self.f1_scatter is not None:
             self.f1_scatter.remove()
@@ -528,7 +530,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             t = self.listWidgetF1.item(i).text().split()
             x_f1.append(self.iono.freq_to_coord(t[0]))
             y_f1.append(float(t[1]))
-        self.f1_scatter = self.ax.scatter(x_f1, y_f1, c=self.F1_COLOR)
+        self.f1_scatter = self.ax.scatter(x_f1, y_f1, c=self.f1_color)
 
         if self.f2_scatter is not None:
             self.f2_scatter.remove()
@@ -539,7 +541,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             t = self.listWidgetF2.item(i).text().split()
             x_f2.append(self.iono.freq_to_coord(t[0]))
             y_f2.append(float(t[1]))
-        self.f2_scatter = self.ax.scatter(x_f2, y_f2, c=self.F2_COLOR)
+        self.f2_scatter = self.ax.scatter(x_f2, y_f2, c=self.f2_color)
 
         if self.es_scatter is not None:
             self.es_scatter.remove()
@@ -550,7 +552,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             t = self.listWidgetEs.item(i).text().split()
             x_es.append(self.iono.freq_to_coord(t[0]))
             y_es.append(float(t[1]))
-        self.es_scatter = self.ax.scatter(x_es, y_es, c=self.ES_COLOR)
+        self.es_scatter = self.ax.scatter(x_es, y_es, c=self.es_color)
 
         self.canvas.draw()
 
@@ -578,15 +580,15 @@ class MainWindow(QMainWindow, Ui_mainWindow):
                 return line
 
         self.f2_critical = plot_line(
-            self.doubleSpinBoxF2, self.f2_critical, self.F2_COLOR
+            self.doubleSpinBoxF2, self.f2_critical, self.f2_color
         )
         self.f1_critical = plot_line(
-            self.doubleSpinBoxF1, self.f1_critical, self.F1_COLOR
+            self.doubleSpinBoxF1, self.f1_critical, self.f1_color
         )
-        self.e_critical = plot_line(self.doubleSpinBoxE, self.e_critical, self.E_COLOR)
+        self.e_critical = plot_line(self.doubleSpinBoxE, self.e_critical, self.e_color)
 
         self.es_critical = plot_line(
-            self.doubleSpinBoxEs, self.es_critical, self.ES_COLOR
+            self.doubleSpinBoxEs, self.es_critical, self.es_color
         )
 
         self.canvas.draw()
@@ -655,6 +657,9 @@ class MainWindow(QMainWindow, Ui_mainWindow):
                 labels = self.iono.get_freq_labels()
                 self.ax.set_xticks(tics)
                 self.ax.set_xticklabels(labels)
+
+                plt.xticks(fontsize=self.program_configuration.font_size)
+                plt.yticks(fontsize=self.program_configuration.font_size)
 
                 plt.tight_layout()
                 self.setWindowTitle(f"{self.program_name} - {file_name}")
@@ -935,7 +940,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.iono.gyro = self.get_value(self.gyrofrequencyLineEdit)
         self.iono.dip = self.get_value(self.dipAngleLineEdit)
         self.iono.sunspot = self.get_value(self.sunspotNumberLineEdit)
-        self.iono.date = datetime.strptime(self.dateTimeEdit.text(), "%Y-%m-%d %H:%M")
+        self.iono.date = datetime.strptime(self.dateTimeEdit.text(), "%Y-%m-%d %H:%M:%S")
         self.iono.timezone = int(self.timeZoneComboBox.currentText().strip())
 
     def save_std(self):
@@ -960,11 +965,18 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         height = 6 if "height" not in kwargs else kwargs["height"]
         dpi = 100 if "dpi" not in kwargs else kwargs["dpi"]
         old_size = self.figure.get_size_inches()
+
         self.figure.set_size_inches(width, height)
-        plt.title(self.get_description())
+        fontsize = self.program_configuration.font_size
+        plt.title(self.get_description(), fontdict={'fontsize': fontsize})
+        plt.xlabel("Frequency [MHz]", fontsize=fontsize)
+        plt.ylabel("Virtual height [km]", fontsize=fontsize)
+
         plt.tight_layout()
         self.figure.savefig(filename, dpi=dpi)
         plt.title("")
+        plt.xlabel("")
+        plt.ylabel("")
         self.figure.set_size_inches(old_size)
         plt.tight_layout()
         self.canvas.draw()
