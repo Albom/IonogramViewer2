@@ -218,7 +218,7 @@ class IonogramIps42(Ionogram):
         return [self.freq_to_coord(x) for x in self.get_freq_labels()]
 
     def get_freq_labels(self):
-        return [1, 1.4, 2, 2.8, 4.0, 5.6, 8, 11.4, 16, 22.6]
+        return [1.0, 1.4, 2.0, 2.8, 4.0, 5.6, 8.0, 11.4, 16.0, 22.6]
 
     def freq_to_coord(self, freq):
         return log(float(freq), 22.6) * 575
