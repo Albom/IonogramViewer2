@@ -29,7 +29,7 @@ class STDFileIO:
         first_line = f"{iono.station_name}//{iono.timezone}"
         second_line = f"{iono.lat} {iono.lon} {iono.gyro} {iono.dip} {iono.sunspot}"
         date = iono.date - datetime.timedelta(hours=iono.timezone)
-        third_line = date.strftime("%Y %m %d %H %M 00\n")
+        third_line = date.strftime("%Y %m %d %H %M %S\n")
 
         foe, e_layer_points = STDFileIO.get_trace_points(
             IonosphericLayers.E_LAYER, traces
