@@ -75,7 +75,7 @@ class STDFileIO:
             timezone = 0
 
         lat, lon, gyro, dip, sunspot = lines[1].strip().split()
-        date = datetime.datetime.strptime(lines[2].strip(), "%Y %m %d %H %M 00")
+        date = datetime.datetime.strptime(lines[2].strip(), "%Y %m %d %H %M %S")
         date += datetime.timedelta(hours=timezone)  # Convert from UT
 
         traces = []
