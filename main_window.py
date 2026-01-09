@@ -1,9 +1,8 @@
 import sys
 import os
 from datetime import datetime, timedelta
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtGui import QFont, QIcon
-from PySide6.QtCore import Qt, QFile, QIODevice, QSize
+from PySide6.QtGui import QFont, QIcon, QCursor
+from PySide6.QtCore import Qt, QSize, QTimer
 from PySide6.QtWidgets import (
     QMainWindow,
     QApplication,
@@ -71,6 +70,10 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.level_spin_box.setValue(100)
         self.level_spin_box.setToolTip("Level (from 10 to 100%)")
         self.toolBar.addWidget(self.level_spin_box)
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.timer_mouse_cursor_proc)
+        self.timer.start(250)
 
         self.connect_actions()
 
@@ -180,6 +183,11 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
     def close_window(self):
         sys.exit()
+
+    def timer_mouse_cursor_proc(self):
+        is_over = self.canvas.underMouse()
+        if self.iono and is_over:
+            self.canvas.setCursor(QCursor(Qt.CursorShape.CrossCursor))
 
     def repair_icons(self):
 
@@ -940,7 +948,9 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.iono.gyro = self.get_value(self.gyrofrequencyLineEdit)
         self.iono.dip = self.get_value(self.dipAngleLineEdit)
         self.iono.sunspot = self.get_value(self.sunspotNumberLineEdit)
-        self.iono.date = datetime.strptime(self.dateTimeEdit.text(), "%Y-%m-%d %H:%M:%S")
+        self.iono.date = datetime.strptime(
+            self.dateTimeEdit.text(), "%Y-%m-%d %H:%M:%S"
+        )
         self.iono.timezone = int(self.timeZoneComboBox.currentText().strip())
 
     def save_std(self):
@@ -968,7 +978,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
         self.figure.set_size_inches(width, height)
         fontsize = self.program_configuration.font_size
-        plt.title(self.get_description(), fontdict={'fontsize': fontsize})
+        plt.title(self.get_description(), fontdict={"fontsize": fontsize})
         plt.xlabel("Frequency [MHz]", fontsize=fontsize)
         plt.ylabel("Virtual height [km]", fontsize=fontsize)
 
