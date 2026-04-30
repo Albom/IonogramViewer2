@@ -1043,7 +1043,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
                      <a href="https://github.com/Albom/IonogramViewer2">https://github.com/Albom/IonogramViewer2</a><br>
                      <br>
                      <br>
-                     © 2018-2025 Oleksandr Bogomaz<br>
+                     © 2018-2026 Oleksandr Bogomaz<br>
                      o.v.bogomaz1985@gmail.com<br>
                  """
 
