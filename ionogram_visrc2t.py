@@ -3,7 +3,7 @@ from scipy import signal
 from datetime import datetime
 from struct import unpack
 import bz2
-import cv2
+from skimage.restoration import denoise_tv_chambolle
 from ionogram import Ionogram
 from colormaps import cmap_two_comp
 
@@ -269,14 +269,8 @@ class IonogramVisrc2t(Ionogram):
         return len(self.frequencies) - 2
 
     def clean_ionogram(self):
-        sign_vals = np.sign(self.data)
-        abs_vals = np.fabs(self.data)
-        abs_vals /= np.max(abs_vals)
-        abs_vals *= 255
 
-        abs_vals = cv2.fastNlMeansDenoising(abs_vals.astype("uint8"), None, 7, 7, 7)
-
-        self.data = abs_vals * sign_vals
+        self.data = denoise_tv_chambolle(self.data, weight=0.005)
 
         min_val = np.min(self.data)
         max_val = np.max(self.data)
