@@ -1,3 +1,8 @@
+
+rmdir /q /s IonogramViewer2.build
+rmdir /q /s IonogramViewer2.dist
+rmdir /q /s IonogramViewer2
+
 python --version
 python -m nuitka ^
   --standalone ^
@@ -12,10 +17,6 @@ python -m nuitka ^
   --windows-file-description="A program for scaling ionograms." ^
   --no-deployment-flag=self-execution ^
   IonogramViewer2.py
-
-rmdir /q /s IonogramViewer2.build
-rmdir /q /s IonogramViewer2.dist
-rmdir /q /s IonogramViewer2
 
 md IonogramViewer2
 
